@@ -1,0 +1,4 @@
+vpc:
+  sample-vpc:
+    project: tudaolw
+    auto_create_subnets: false
