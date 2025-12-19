@@ -1,0 +1,117 @@
+---
+eks:
+  its-cluster:
+    version: "1.32"
+    enable_irsa: true
+    authentication_mode: "API_AND_CONFIG_MAP"
+    vpc_key: main-vpc
+    cluster_endpoint_private_access: true
+    cluster_endpoint_public_access: false
+    subnet_key: eks_subnets
+    
+    cluster_encryption_config: 
+      - resources: ["secrets"]
+        provider:
+          key_id: "alias/eks-cluster-encryption-key"
+    
+    #EKS Add-ons
+    cluster_addons:
+      coredns:
+        most_recent: true
+      kube-proxy:
+        most_recent: true
+      vpc-cni:
+        most_recent: true
+        configuration_values: |
+          {
+            "env": {
+              "ENABLE_PREFIX_DELEGATION": "true",
+              "ENABLE_POD_ENI": "true",
+              "POD_SECURITY_GROUP_ENFORCING_MODE": "standard"
+            }
+          }
+      aws-ebs-csi-driver:
+        most_recent: true
+        service_account_role_name: "AmazonEKS_EBS_CSI_DriverRole"
+    
+    # IRSA configurations
+    iam_service_accounts:
+      - name: aws-load-balancer-controller
+        namespace: kube-system
+        role_name: "AmazonEKSLoadBalancerControllerRole"
+        
+      - name: karpenter
+        namespace: karpenter
+        role_name: "KarpenterControllerRole-its-cluster"
+        
+      - name: external-secrets
+        namespace: external-secrets-system
+        role_name: "ExternalSecretsOperatorRole"
+        
+      - name: cert-manager
+        namespace: cert-manager
+        role_name: "CertManagerRole"
+        
+      - name: argocd-server
+        namespace: argocd
+        role_name: "ArgoCDServerRole"
+        
+      - name: aws-node-termination-handler
+        namespace: kube-system
+        role_name: "AWSNodeTerminationHandlerRole"
+
+    admin_access_roles:
+      - key: "its-bastion" 
+        access_policy: "AmazonEKSClusterAdminPolicy"
+
+    # node group
+    node_groups:
+      eks-ng-1:
+        desired_capacity: 2
+        max_capacity: 2  
+        min_capacity: 1
+        instance_type: "t3.medium" 
+        node_role_name: "its-eks-ng-1-role"
+        capacity_type: "ON_DEMAND"  
+        ami_type: "AL2_x86_64"
+        disk_size: 30
+        
+        # metadata_options:
+        #   http_endpoint: "enabled"
+        #   http_tokens: "required"
+        #   http_put_response_hop_limit: 2
+        
+        # Karpenter discovery tags
+        tags:
+          "karpenter.sh/discovery": "its-cluster"
+          "kubernetes.io/cluster/its-cluster": "owned"
+        
+        # prevent regular workloads on system nodes
+        taints:
+          # - key: "CriticalAddonsOnly"
+          #   value: "true"
+          #   effect: "NO_SCHEDULE"
+        
+        # Labels for node
+        labels:
+          node-type: "system"
+          workload: "critical-addons"
+
+    # Fargate profiles
+    fargate_profiles:
+      karpenter:
+        selectors:
+          - namespace: karpenter
+      # system-components:
+      #   selectors:
+      #     - namespace: cert-manager
+      #     - namespace: external-secrets-system
+      #     - namespace: argocd
+      #       labels:
+      #         app.kubernetes.io/component: server
+
+    # CloudWatch logging 
+    # cloudwatch:
+    #   clusterLogging:
+    #     enableTypes: ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+

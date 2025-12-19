@@ -1,0 +1,84 @@
+---
+role:
+  AmazonEKSLoadBalancerControllerRole:
+    type: "irsa"
+    managed_policies:
+      - "arn:aws:iam::123456789012:policy/AWSLoadBalancerControllerIAMPolicy"
+    policy_file: "policy/aws-lb-controller.json"
+
+  KarpenterControllerRole-its-cluster:
+    type: "irsa"
+    inline_policy: |
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "ec2:CreateLaunchTemplate",
+              "ec2:CreateFleet",
+              "ec2:RunInstances",
+              "ec2:CreateTags",
+              "iam:PassRole",
+              "ec2:TerminateInstances",
+              "ec2:Describe*"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
+
+  ExternalSecretsOperatorRole:
+    type: "irsa"
+    managed_policies:
+      - "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+
+  CertManagerRole:
+    type: "irsa"
+    managed_policies:
+      - "arn:aws:iam::aws:policy/AmazonRoute53FullAccess"
+
+  ArgoCDServerRole:
+    type: "irsa"
+    managed_policies: [] 
+
+  AWSNodeTerminationHandlerRole:
+    type: "irsa"
+    managed_policies:
+      - "arn:aws:iam::aws:policy/AutoScalingReadOnlyAccess"
+
+  #--- Node & Instance Roles---
+  its-eks-ng-1-role:
+    type: "ec2"
+    managed_policies:
+      - "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+      - "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+      - "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+      - "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+    create_instance_profile: true
+
+  its-bastion-profile:
+    type: "ec2"
+    managed_policies:
+      - "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+    inline_policy: |
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Action": [
+              "eks:DescribeCluster",
+              "eks:ListClusters",
+              "eks:DescribeNodegroup",
+              "eks:ListNodegroups",
+              "eks:DescribeUpdate",
+              "eks:ListUpdates",
+              "eks:DescribeAddon",
+              "eks:ListAddons"
+            ],
+            "Resource": "*"
+          }
+        ]
+      }
+    create_instance_profile: true

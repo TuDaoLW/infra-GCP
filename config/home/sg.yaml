@@ -1,0 +1,157 @@
+---
+sg:
+  its-bastion-sg:
+    description: "Security group for its-bastion"
+    vpc_key: main-vpc
+    ingress: [] #none
+    egress:
+      - Name: "HTTPS-Outbound"
+        from_port: 443
+        to_port: 443
+        protocol: "tcp"
+        cidr_blocks: ["0.0.0.0/0"]
+      - Name: "HTTP-Outbound"
+        from_port: 80
+        to_port: 80
+        protocol: "tcp"
+        cidr_blocks: ["0.0.0.0/0"]          
+      - Name: "DNS-UDP"
+        from_port: 53
+        to_port: 53
+        protocol: "udp"
+        cidr_blocks: ["0.0.0.0/0"]          
+      - Name: "DNS-TCP"
+        from_port: 53
+        to_port: 53
+        protocol: "tcp"
+        cidr_blocks: ["0.0.0.0/0"]  
+      - Name: "EKS-API-Access"
+        from_port: 443
+        to_port: 443
+        protocol: "tcp" 
+        source_security_group_key: "eks-cluster-sg"
+      - Name: "EKS-Worker-Access"
+        from_port: 10250
+        to_port: 10250
+        protocol: "tcp"
+        source_security_group_key: "eks-worker-sg"
+
+  eks-cluster-sg:
+    vpc_key: main-vpc
+    description: "Security group for EKS cluster control plane"
+    ingress:
+      - Name: "HTTPS from bastion host"
+        from_port: 443
+        to_port: 443
+        protocol: "tcp"
+        source_security_group_key: "its-bastion-sg" 
+      - Name: "HTTPS from worker nodes"
+        from_port: 443
+        to_port: 443
+        protocol: "tcp"
+        source_security_group_key: "eks-worker-sg"
+      - Name: "HTTPS from Fargate pods"
+        from_port: 443
+        to_port: 443
+        protocol: "tcp"
+        source_security_group_key: "eks-fargate-sg"
+    egress:
+      - Name: "All outbound traffic"
+        from_port: 0
+        to_port: 65535
+        protocol: "tcp"
+        cidr_blocks: ["0.0.0.0/0"]
+
+  eks-worker-sg:
+    description: "Security group for EKS worker nodes"
+    vpc_key: main-vpc
+    ingress:
+      - Name: "Node to node communication"
+        from_port: 0
+        to_port: 65535
+        protocol: "tcp"
+        source_security_group_key: "eks-worker-sg"
+      - Name: "Pod to pod communication"
+        from_port: 0
+        to_port: 65535
+        protocol: "tcp"
+        source_security_group_key: "eks-worker-sg"
+      - Name: "Kubelet API from control plane"
+        from_port: 10250
+        to_port: 10250
+        protocol: "tcp"
+        source_security_group_key: "eks-cluster-sg"
+      - Name: "Kubelet API from bastion"
+        from_port: 10250
+        to_port: 10250
+        protocol: "tcp"
+        source_security_group_key: "its-bastion-sg"
+      - Name: "NodePort services"
+        from_port: 30000
+        to_port: 32767
+        protocol: "tcp"
+        source_security_group_key: "alb-sg"
+    egress:
+      - Name: "All outbound traffic"
+        from_port: 0
+        to_port: 0
+        protocol: "-1"
+        cidr_blocks: ["0.0.0.0/0"]
+
+  alb-sg:
+    description: "Security group for Application Load Balancer"
+    vpc_key: main-vpc
+    ingress:
+      - Name: "HTTP from internet"
+        from_port: 80
+        to_port: 80
+        protocol: "tcp"
+        cidr_blocks: ["0.0.0.0/0"]
+      - Name: "HTTPS from internet"
+        from_port: 443
+        to_port: 443
+        protocol: "tcp"
+        cidr_blocks: ["0.0.0.0/0"]
+    egress:
+      - Name: "Traffic to worker nodes"
+        from_port: 0
+        to_port: 65535
+        protocol: "tcp"
+        source_security_group_key: "eks-worker-sg"
+
+  rds-sg:
+    description: "Security group for RDS database"
+    vpc_key: main-vpc
+    ingress:
+      - Name: "MySQL/Aurora from EKS workers"
+        from_port: 3306
+        to_port: 3306
+        protocol: "tcp"
+        source_security_group_key: "eks-worker-sg"
+      - Name: "MySQL/Aurora from bastion"
+        from_port: 3306
+        to_port: 3306
+        protocol: "tcp"
+        source_security_group_key: "its-bastion-sg"
+    egress: []  # No outbound
+
+  vpc-endpoints-sg:
+    description: "Security group for VPC endpoints"
+    vpc_key: main-vpc
+    ingress:
+      - Name: "HTTPS from bastion"
+        from_port: 443
+        to_port: 443
+        protocol: "tcp"
+        source_security_group_key: "its-bastion-sg"
+      - Name: "HTTPS from EKS workers"
+        from_port: 443
+        to_port: 443
+        protocol: "tcp"
+        source_security_group_key: "eks-worker-sg"
+      - Name: "HTTPS from EKS cluster"
+        from_port: 443
+        to_port: 443
+        protocol: "tcp"
+        source_security_group_key: "eks-cluster-sg"
+    egress: []

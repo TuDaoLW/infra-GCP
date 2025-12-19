@@ -1,0 +1,7 @@
+---
+global_tags:
+  owner: "tudaolw"
+  environment: "homelab"
+  email: "tudaolw@example.com"
+  region: "ap-southeast-1"
+  project: "its-homelab"

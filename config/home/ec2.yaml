@@ -1,0 +1,31 @@
+---
+ec2:
+  its-bastion:
+    instance_type: t3.micro
+    ami_id: "ami-0d5d9d301c853a04a"
+    subnet_key: management_subnets
+    iam_instance_profile: its-bastion-profile
+    security_groups:
+      - its-bastion-sg
+    associate_public_ip_address: false
+    enable_ssm_access: true 
+    additional_tags:
+      Name: bastion-host
+    root_block_device:
+      volume_type: "gp3"
+      volume_size: 20
+      encrypted: true
+      delete_on_termination: true
+    extra_block_devices:
+      - device_name: "/dev/sdb"
+        volume_type: "gp3"
+        volume_size: 50
+        encrypted: true
+        delete_on_termination: true
+    user_data: |
+      #!/bin/bash
+      apt update -y
+      apt install -y amazon-ssm-agent
+      systemctl enable amazon-ssm-agent
+      systemctl start amazon-ssm-agent
+
