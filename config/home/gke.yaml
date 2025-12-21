@@ -1,6 +1,6 @@
 ---
 gke_clusters:
-  - name: cluster-sea1
+  cluster-sea1:
     project_id: adroit-nimbus-481707-i0
     location: asia-southeast1 # A regional cluster, zonal?
     description: "Primary GKE cluster for application workloads in the asia-southeast1 region."
@@ -40,12 +40,12 @@ gke_clusters:
       enable_system_components: true
       enable_managed_prometheus: false # For Prometheus-style metrics collection without the overhead.
     cost_management_config:
-      enabled: true # Enables cost allocation features for GKE.
+      enabled: false # Enables cost allocation features for GKE.
     addons_config:
       http_load_balancing:
         disabled: false # For GKE Ingress
-      network_policy_config:
-        disabled: false # For enabling Kubernetes Network Policies
+      # network_policy_config:
+      #   disabled: false # For enabling Kubernetes Network Policies in non autopilot
 
     # --- Maintenance Configuration ---
     maintenance_policy: # R: Define a specific window for maintenance.

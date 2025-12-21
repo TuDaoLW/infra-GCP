@@ -14,10 +14,6 @@ firewall_rules:
   #     - protocol: tcp
   #       ports: ["22"]
   #   description: "Allows SSH from specified trusted admin IP ranges to VMs with 'ssh-allowed' tag."
-  #   labels:
-  #     environment: "production"
-  #     owner: "security-team"
-  #     service: "ssh-access"
 
   allow-iap-ssh: # Access to VMs with no public IP via IAP, like AWS SSM
     network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
@@ -30,10 +26,6 @@ firewall_rules:
       - protocol: tcp
         ports: ["22"]
     description: "Allows SSH access to VMs tagged 'iap-ssh' via Google Cloud IAP (Identity-Aware Proxy)."
-    labels:
-      environment: "production"
-      owner: "security-team"
-      service: "iap-access"
 
   # Critical for GKE cluster operation
   allow-gke-control-plane-communication:
@@ -52,10 +44,6 @@ firewall_rules:
       - protocol: tcp
         ports: ["10250", "443"] # Kubelet API, HTTPS
     description: "Allows GKE control plane to communicate with worker nodes. Critical for cluster functionality."
-    labels:
-      environment: "production"
-      owner: "gke-admin"
-      service: "gke-control-plane"
 
   # Application-Specific Ingress Rules
   allow-gke-to-databases:
@@ -77,11 +65,6 @@ firewall_rules:
       - protocol: tcp
         ports: ["5432", "3306", "1433", "6379"] # PostgreSQL, MySQL, SQL Server, Redis
     description: "Allows traffic from GKE nodes/pods to the database subnet on specified database ports."
-    labels:
-      environment: "production"
-      owner: "app-team"
-      application: "gke"
-      service: "database-connectivity"
       
   # internal VPC communication
   allow-internal-all-subnets:
@@ -100,10 +83,6 @@ firewall_rules:
         ports: ["0-65535"]
       - protocol: icmp
     description: "Allows all TCP/UDP/ICMP communication between internal subnets within the 'sample-vpc'."
-    labels:
-      environment: "production"
-      owner: "network-team"
-      service: "internal-connectivity"
 
   # Load Balancer Health Check Rules (Required for Load Balancers)
   allow-lb-health-checks: # Allows Google Cloud Load Balancer health probes
@@ -127,10 +106,6 @@ firewall_rules:
       - protocol: tcp
         ports: ["80", "443", "8080", "8443", "10250"]
     description: "Allows Google Cloud Load Balancer health check probes to target backends."
-    labels:
-      environment: "production"
-      owner: "network-team"
-      service: "load-balancer"
 
   # ------------------------------------------------------------------------
   # Egress Rules (Outbound Traffic)
@@ -153,10 +128,6 @@ firewall_rules:
         ports: ["53"] # DNS
       - protocol: icmp # Ping and other ICMP uses
     description: "Allows specified instances to make outbound connections to the internet on common ports."
-    labels:
-      environment: "production"
-      owner: "network-team"
-      service: "internet-egress"
 
   # ------------------------------------------------------------------------
   # Catch-All Deny Rules (Critical for Security)
@@ -173,10 +144,6 @@ firewall_rules:
     protocols:
       - protocol: all # Deny all protocols
     description: "Explicitly denies all inbound traffic not explicitly allowed by higher priority rules. Critical for 'deny by default' security."
-    labels:
-      environment: "production"
-      owner: "security-team"
-      service: "deny-default"
 
   deny-all-other-egress: # Explicitly deny all other outbound traffic
     network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
@@ -188,10 +155,6 @@ firewall_rules:
     protocols:
       - protocol: all # Deny all protocols
     description: "Explicitly denies all outbound traffic not explicitly allowed by higher priority rules. Critical for 'deny by default' security."
-    labels:
-      environment: "production"
-      owner: "security-team"
-      service: "deny-default"
 
   # ------------------------------------------------------------------------
   # Essential GCP Default-like Rules (often implicitly created or best to define)
@@ -207,10 +170,6 @@ firewall_rules:
     protocols:
       - protocol: icmp
     description: "Allows internal ICMP traffic for basic network diagnostics (ping)."
-    labels:
-      environment: "production"
-      owner: "network-team"
-      service: "internal-diagnostics"
 
 
 
