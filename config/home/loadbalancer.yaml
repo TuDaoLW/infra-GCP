@@ -1,0 +1,67 @@
+load_balancer:
+  prod-global-app-lb-shared:
+    project_id: adroit-nimbus-481707-i0
+    frontend:
+      name: prod-global-lb-frontend-shared
+      project_id: adroit-nimbus-481707-i0
+      create_address: true
+      ssl: true
+      managed_ssl_certificate_domains:
+        - "api.yourdomain.com"
+      https_redirect: true
+      load_balancing_scheme: EXTERNAL_MANAGED
+
+      # KEY: Define all your routes here in the URL Map
+      host_path_mappings:
+        - host: "*"
+          path: "/vm-group/*"
+          backend_service: "prod-vm-group-backend-service"
+        - host: "*"
+          path: "/single-vm/*"
+          backend_service: "prod-single-vm-backend-service"
+        - host: "*"
+          path: "/serverless/*"
+          backend_service: "prod-cloud-run-backend-service"
+
+    # --- Backend Service for the VM Group (MIG) ---
+    backend_service_vm_group:
+      name: prod-vm-group-backend-service
+      project_id: adroit-nimbus-481707-i0
+      load_balancing_scheme: EXTERNAL_MANAGED
+      protocol: HTTP
+      health_check:
+        protocol: HTTP
+        port: 80
+        request_path: "/"
+      # This backend points to a Managed Instance Group
+      instance_group_backends:
+        - name: "my-vm-group-mig"
+          zone: "us-central1-a"
+          port_name: "http"
+
+    # --- Backend Service for the Single VM ---
+    backend_service_single_vm:
+      name: prod-single-vm-backend-service
+      project_id: adroit-nimbus-481707-i0
+      load_balancing_scheme: EXTERNAL_MANAGED
+      protocol: HTTP
+      health_check:
+        protocol: HTTP
+        port: 80
+        request_path: "/"
+      # For a single VM, you'd use an Unmanaged Instance Group containing just that VM
+      instance_group_backends:
+        - name: "my-single-vm-unmanaged-ig"
+          zone: "us-central1-a"
+          port_name: "http"
+
+    # --- Backend Service for Cloud Run ---
+    backend_service_cloud_run:
+      name: prod-cloud-run-backend-service
+      project_id: adroit-nimbus-481707-i0
+      load_balancing_scheme: EXTERNAL_MANAGED
+      protocol: HTTP
+      # This backend points to a Serverless NEG for your Cloud Run service
+      serverless_neg_backends:
+        - service_name: "my-cloud-run-service"
+          region: "us-central1"

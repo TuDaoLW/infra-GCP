@@ -1,0 +1,11 @@
+- Network-level Scope: VPC firewall rules are defined at the VPC network level (e.g., your sample-vpc ) and apply globally across all regions and zones of that network.
+- Rule Application: Instead of attaching to instances or subnets directly, firewall rules are applied to instances based on:
+- Network Tags: Arbitrary labels you assign to VM instances (e.g., management-server , ssh-access from your VM config). This is the closest conceptual equivalent to how security groups might target instances.
+- Service Accounts: You can target firewall rules to VMs running with a specific service account. This is a powerful and secure method, linking network access to the VM's identity.
+- IP Ranges: Source or destination IP ranges.
+- Stateful: GCP firewall rules are stateful. If an inbound connection is allowed, the corresponding outbound return traffic is automatically permitted.
+- Implicit Rules:
+- An implicit deny ingress rule: By default, all incoming traffic is blocked. You must explicitly create rules to allow inbound traffic.
+- An implicit allow egress rule: By default, all outgoing traffic is allowed. You can create rules to explicitly deny outbound traffic.
+- Priorities: Rules have priorities (0-65535, where 0 is highest priority). Rules with higher priority (lower numerical value) are evaluated first.
+# personaly i prefer using tags cause it look a lot more cleaner than other 2

@@ -1,0 +1,97 @@
+firewall_rules:
+  - name: allow-ssh-to-management-vm # SSH access
+    network: sample-vpc
+    direction: INGRESS
+    priority: 100 
+    action: ALLOW
+    source_ranges: ["YOUR_ADMIN_IP_RANGE_1", "YOUR_ADMIN_IP_RANGE_2"]
+    target_tags: ["ssh-allowed"] # Applies to VMs tagged 'ssh-allowed'
+    protocols:
+      - protocol: tcp
+        ports: ["22"]
+    description: "Allows SSH from trusted admin IP ranges to management VMs."
+
+  - name: allow-gke-to-databases 
+    network: sample-vpc
+    direction: INGRESS
+    priority: 200 
+    action: ALLOW
+    source_service_accounts: ["gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"] # sample with SA
+    # source_ranges:
+    #   - 10.0.2.0/23  # GKE Node IPs 
+    #   - 10.0.4.0/21  # GKE Pod IPs
+    target_ranges:
+      - 10.0.1.0/24  # Database subnet
+    protocols:
+      - protocol: tcp
+        ports: ["5432", "3306", "1433"] # Example: PostgreSQL, MySQL, SQL Server
+    description: "Allows GKE nodes/pods to connect to database instances."
+
+  - name: allow-internal-all-subnets # General internal communication within the VPC
+    network: sample-vpc
+    direction: INGRESS
+    priority: 300 
+    action: ALLOW
+    source_ranges:
+      - 10.0.0.0/8 #e.g., ["10.0.0.0/24", "10.0.1.0/24", ...]
+    target_ranges:
+      - 10.0.0.0/8 # Same as source
+    protocols:
+      - protocol: tcp
+        ports: ["0-65535"] 
+      - protocol: udp
+        ports: ["0-65535"]
+      - protocol: icmp   
+    description: "Allows all TCP/UDP/ICMP communication between internal subnets."
+
+
+  # ------------------------------------------------------------------------
+  # Health Check Rules (Required for Load Balancers)
+  # GCP Load Balancers use specific IP ranges for health checks.
+  # ------------------------------------------------------------------------
+
+  - name: allow-lb-health-checks
+    network: sample-vpc
+    direction: INGRESS
+    priority: 500
+    action: ALLOW
+    source_ranges:
+      - 35.191.0.0/16 # Ranges for external HTTP(S), SSL Proxy, TCP Proxy LB health checks
+      - 130.211.0.0/22 # Ranges for all Load Balancer health checks
+    # Target should be the instances that the LB will check (e.g., your GKE nodes, VMs)
+    # Using a common tag for all LB backends
+    #target_tags: ["gke-node", "application-backend"] # Example tags. Add tags that your GKE nodes/VMs will have.
+    target_service_accounts:
+      - "gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com" #sample using SA
+    protocols:
+      - protocol: tcp
+        ports: ["80", "443", "8080"] # Common application ports for health checks. Adjust as needed.
+    description: "Allows Google Cloud Load Balancer health check probes."
+
+  - name: allow-egress-to-internet # outbound connections to the internet
+    network: sample-vpc
+    direction: EGRESS
+    priority: 1000 # Lower priority than internal rules
+    action: ALLOW
+    destination_ranges: ["0.0.0.0/0"] 
+    # If using Cloud NAT, VMs without public IPs will rely on NAT, this rule applies to VMs with public IPs.
+    target_tags: ["outbound-internet", "management-server"]
+    protocols:
+      - protocol: tcp
+        ports: ["80", "443", "53"] 
+      - protocol: udp
+        ports: ["53"]            
+      - protocol: icmp     
+    description: "Allows specified instances to make outbound connections to the internet."
+    # DEFAULT 
+  - name: deny-all-other-ingress
+    network: sample-vpc
+    direction: INGRESS
+    priority: 65534 # evaluated last for ingress
+    action: DENY
+    source_ranges: ["0.0.0.0/0"] # From anywhere
+    target_ranges: ["0.0.0.0/0"]
+    protocols:
+      - protocol: all
+    description: "Explicitly denies all inbound traffic not explicitly allowed by higher priority rules."
+

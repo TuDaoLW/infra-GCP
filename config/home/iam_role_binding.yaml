@@ -1,0 +1,118 @@
+---
+iam_role_bindings:
+  - name: management-vm-operator-binding # Unique identifier 
+    role: "projects/adroit-nimbus-481707-i0/roles/managementVmOperator"
+    members:
+      - "serviceAccount:management-vm-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
+    resource_id: "adroit-nimbus-481707-i0" # The specific resource this binding applies to
+    resource_type: "project" # The type of resource (e.g., "project", "bucket")
+    description: "Binds the custom Management VM Operator role to the management service account at the project level."
+    condition: # Optional: Example (e.g., time-based access)
+      # title: "temporary-access"
+      # expression: "request.time < timestamp(\"2024-12-31T23:59:59Z\")"
+      # description: "Temporary access for management VM during migration phase."
+    labels:
+      environment: "production"
+      owner: "operations"
+      binding-type: "custom-role"
+
+  # Binding for GKE Application Service Account to Read Storage (for pod)
+  - name: my-app-gsa-storage-reader-binding
+    role: "roles/storage.objectViewer" # Predefined role
+    members:
+      - "serviceAccount:my-app-gsa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
+    resource_id: "adroit-nimbus-481707-i0"
+    resource_type: "project"
+    description: "Grants GSA 'my-app-gsa' object viewer access to all buckets in the project."
+    # Production Recommendation: Consider binding this at the specific bucket level for more security:
+    # resource_id: "my-app-bucket-name"
+    # resource_type: "bucket"
+    labels:
+      environment: "production"
+      owner: "app-dev-team"
+      binding-type: "predefined-role"
+
+  # Binding for Workload Identity: Allow KSA to Impersonate GSA for My App
+  - name: workload-identity-my-app-binding
+    # This role binding is applied ON the Google Service Account itself (my-app-gsa),
+    # NOT the project. This is a critical distinction for Workload Identity.
+    role: "roles/iam.workloadIdentityUser" # Special IAM role for Workload Identity
+    members:
+      # Format: 'serviceAccount:PROJECT_ID.svc.id.goog[NAMESPACE/KSA_NAME]'
+      - "serviceAccount:adroit-nimbus-481707-i0.svc.id.goog[default/my-app-ksa]"
+    resource_id: "my-app-gsa@adroit-nimbus-481707-i0.iam.gserviceaccount.com" # The GSA being impersonated
+    resource_type: "serviceAccount" # Google Service Account
+    description: "Enables Kubernetes Service Account 'default/my-app-ksa' to impersonate 'my-app-gsa' via Workload Identity."
+    labels:
+      environment: "production"
+      owner: "gke-admin"
+      binding-type: "workload-identity"
+
+  # GKE Node Pool Access (if not using Autopilot)
+  # For Standard GKE clusters, these are essential for node functionality.
+  # For Autopilot, the underlying nodes are managed by Google and you primarily use Workload Identity for workloads.
+  # - name: gke-node-pool-access-binding
+  #   role: "roles/container.nodeServiceAccount" # Predefined GKE node service account role
+  #   members:
+  #     - "serviceAccount:gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
+  #   resource_id: "adroit-nimbus-481707-i0"
+  #   resource_type: "project"
+  #   description: "Grants essential permissions for GKE worker nodes (e.g., to register with the control plane, pull images)."
+  #   labels: { environment: "production", owner: "gke-admin", binding-type: "predefined-role" }
+
+  # - name: gke-node-logging-binding
+  #   role: "roles/logging.logWriter"
+  #   members:
+  #     - "serviceAccount:gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
+  #   resource_id: "adroit-nimbus-481707-i0"
+  #   resource_type: "project"
+  #   description: "Allows GKE worker nodes to write logs to Cloud Logging."
+  #   labels: { environment: "production", owner: "gke-admin", binding-type: "predefined-role" }
+
+  # - name: gke-node-monitoring-binding
+  #   role: "roles/monitoring.metricWriter"
+  #   members:
+  #     - "serviceAccount:gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
+  #   resource_id: "adroit-nimbus-481707-i0"
+  #   resource_type: "project"
+  #   description: "Allows GKE worker nodes to write metrics to Cloud Monitoring."
+  #   labels: { environment: "production", owner: "gke-admin", binding-type: "predefined-role" }
+
+
+  # Bind predefined role to Cloud Run service account
+  - name: cloud-run-viewer-binding
+    role: "roles/run.viewer" # Example: Read-only access to Cloud Run services metadata
+    members:
+      - "serviceAccount:cloud-run-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
+    resource_id: "adroit-nimbus-481707-i0"
+    resource_type: "project"
+    description: "Grants Cloud Run service account 'cloud-run-sa' read access to Cloud Run service configurations."
+    labels:
+      environment: "production"
+      owner: "serverless-dev-team"
+      binding-type: "predefined-role"
+
+  # Example: If Cloud Run needs to write to a database or GCS, bind specific roles here.
+  # - name: cloud-run-storage-creator-binding
+  #   role: "roles/storage.objectCreator"
+  #   members:
+  #     - "serviceAccount:cloud-run-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
+  #   resource_id: "my-cloud-run-data-bucket" # Bind at the bucket level for granular access
+  #   resource_type: "bucket"
+  #   description: "Allows Cloud Run service to create objects in a specific storage bucket."
+  #   labels: { environment: "production", owner: "serverless-dev-team", binding-type: "predefined-role" }
+
+  # Example: Granting a predefined role to a human user or group
+  # - name: admin-team-editor-binding
+  #   role: "roles/editor" # A broader role, use with caution and only for trusted admin users/groups
+  #   members:
+  #     - "user:admin-user@example.com"
+  #     - "group:gcp-admins@example.com"
+  #   resource_id: "adroit-nimbus-481707-i0"
+  #   resource_type: "project"
+  #   description: "Grants editor permissions to admin users and groups for the project."
+  #   condition: # Example of a condition for human users
+  #     title: "access-from-trusted-network"
+  #     expression: "request.matchIP('203.0.113.0/24')" # Only allow if source IP is from trusted range
+  #     description: "Editor access only from the corporate network."
+  #   labels: { environment: "production", owner: "security-team", binding-type: "human-access" }

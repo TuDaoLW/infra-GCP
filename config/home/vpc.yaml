@@ -1,4 +1,91 @@
-vpc:
-  sample-vpc:
-    project: tudaolw
-    auto_create_subnets: false
+---
+vpc_networks:
+  - name: sample-vpc
+    project_id: adroit-nimbus-481707-i0
+    auto_create_subnetworks: false # custom subnets
+    routing_mode: REGIONAL # Or GLOBAL
+    mtu: 1460
+    description: "VPC network for core services and applications"
+    # Tags are used for firewall rules and route targeting
+    # Labels are for resource organization and cost management
+    tags:
+      - "costcenter-main" # Example tag
+    labels:
+      environment: "production" 
+      owner: "network-team"     
+      application: "core-services"
+
+    subnets:
+      - name: management
+        region: asia-southeast1
+        ip_cidr_range: 10.0.0.0/24
+        private_ip_google_access: true # Enable Private Google Access
+        description: "Subnet for management VMs and tools"
+        labels:
+          environment: "production"
+          tier: "management"
+        tags:
+          - "management-access" # tag for firewall rules
+
+      - name: databases
+        region: asia-southeast1
+        ip_cidr_range: 10.0.1.0/24
+        private_ip_google_access: true
+        description: "Subnet for database instances (e.g., Cloud SQL, self-managed databases)"
+        labels:
+          environment: "production"
+          tier: "database"
+        tags:
+          - "database-access"
+
+      - name: gke-primary
+        region: asia-southeast1
+        ip_cidr_range: 10.0.2.0/23
+        private_ip_google_access: true
+        description: "Primary subnet for GKE cluster nodes"
+        labels:
+          environment: "production"
+          application: "gke"
+          tier: "compute"
+        secondary_ip_ranges:
+          - range_name: gke-pods
+            ip_cidr_range: 10.0.4.0/21
+          - range_name: gke-services
+            ip_cidr_range: 10.0.10.0/23
+        tags:
+          - "gke-nodes"
+
+      - name: serverless-cloudrun
+        region: asia-southeast1
+        ip_cidr_range: 10.0.6.0/24
+        private_ip_google_access: false
+        description: "Subnet for Serverless VPC Access for Cloud Run"
+        labels:
+          environment: "production"
+          application: "serverless"
+        tags:
+          - "cloudrun-connector"
+
+      - name: compute-vm
+        region: asia-southeast1
+        ip_cidr_range: 10.0.7.0/24
+        private_ip_google_access: false
+        description: "Subnet for general purpose Compute Engine VMs"
+        labels:
+          environment: "production"
+          tier: "compute"
+        tags:
+          - "general-vm"
+
+      - name: loadbalancer-proxy
+        region: asia-southeast1
+        ip_cidr_range: 10.0.255.0/28
+        purpose: REGIONAL_MANAGED_PROXY # This is correct for internal HTTP(S) Load Balancers
+        role: ACTIVE # Indicates this is an active proxy subnet
+        private_ip_google_access: false
+        description: "Dedicated proxy-only subnet for internal HTTP(S) Load Balancers"
+        labels:
+          environment: "production"
+          tier: "networking"
+        tags:
+          - "lb-proxy"

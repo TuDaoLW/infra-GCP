@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: my-app-ksa # The name of the KSA
+  namespace: default 
+  annotations:
+    # This annotation links the KSA to the GSA. This is the magic of Workload Identity.
+    iam.gke.io/gcp-service-account: my-app-gsa@adroit-nimbus-481707-i0.iam.gserviceaccount.com
