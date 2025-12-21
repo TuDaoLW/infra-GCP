@@ -5,9 +5,7 @@ service_accounts:
     display_name: "Service Account for Management VM" 
     description: "Used by the management VM for OS Login, logging, monitoring, and script access to Google Cloud services."
     project_id: adroit-nimbus-481707-i0
-    labels: 
-      environment: "production"
-      owner: "operations"
+    extra_labels: 
       application: "management"
 
   # Service Account for GKE nodes (if not using Autopilot, or for specific workloads in Standard)
@@ -16,9 +14,7 @@ service_accounts:
     display_name: "Service Account for GKE Nodes"
     description: "Used by GKE worker nodes to access Google Cloud APIs (e.g., pulling images, writing logs)."
     project_id: adroit-nimbus-481707-i0
-    labels:
-      environment: "production"
-      owner: "gke-admin"
+    extra_labels:
       application: "gke"
 
   # Service Account for application pods in GKE (using Workload Identity)
@@ -28,9 +24,7 @@ service_accounts:
     display_name: "Service Account for My Application in GKE"
     description: "Used by specific application pods in GKE via Workload Identity to access GCP services."
     project_id: adroit-nimbus-481707-i0
-    labels:
-      environment: "production"
-      owner: "app-dev-team"
+    extra_labels:
       application: "my-app-name"
 
   - name: cloud-run-sa
@@ -38,7 +32,5 @@ service_accounts:
     display_name: "Service Account for Cloud Run Services"
     description: "Used by Cloud Run services to access backend GCP services securely (e.g., Cloud SQL, Storage, Pub/Sub)."
     project_id: adroit-nimbus-481707-i0
-    labels:
-      environment: "production"
-      owner: "serverless-dev-team"
+    extra_labels:
       application: "cloud-run-service-name"

@@ -40,9 +40,7 @@ iam_custom_roles:
       - "serviceusage.services.get" 
       - "serviceusage.services.list" 
 
-    labels:
-      environment: "production"
-      owner: "operations"
-      application: "iam" # Label for the type of resource
+    extra_labels:
+      application: "iam"
       role-type: "custom"
 

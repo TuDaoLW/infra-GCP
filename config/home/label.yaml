@@ -1,0 +1,5 @@
+---
+global_labels:
+  environment: "production" 
+  owner: "network-team"     
+  application: "core-services"

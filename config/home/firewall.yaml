@@ -1,97 +1,216 @@
+---
 firewall_rules:
-  - name: allow-ssh-to-management-vm # SSH access
-    network: sample-vpc
+  # Management rules
+  # - name: allow-ssh-from-admin-ips # use IAP
+  #   network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
+  #   direction: INGRESS
+  #   priority: 100
+  #   action: ALLOW
+  #   source_ranges:
+  #     - "YOUR_ADMIN_IP_RANGE_1" 
+  #     - "YOUR_ADMIN_IP_RANGE_2"
+  #   target_tags: ["ssh-allowed"] # Applies to VMs tagged 'ssh-allowed'
+  #   protocols:
+  #     - protocol: tcp
+  #       ports: ["22"]
+  #   description: "Allows SSH from specified trusted admin IP ranges to VMs with 'ssh-allowed' tag."
+  #   labels:
+  #     environment: "production"
+  #     owner: "security-team"
+  #     service: "ssh-access"
+
+  allow-iap-ssh: # Access to VMs with no public IP via IAP, like AWS SSM
+    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
     direction: INGRESS
-    priority: 100 
+    priority: 110
     action: ALLOW
-    source_ranges: ["YOUR_ADMIN_IP_RANGE_1", "YOUR_ADMIN_IP_RANGE_2"]
-    target_tags: ["ssh-allowed"] # Applies to VMs tagged 'ssh-allowed'
+    source_ranges: ["35.235.240.0/20"] # Google's IP range for IAP TCP Forwarding
+    target_tags: ["iap-ssh"]
     protocols:
       - protocol: tcp
         ports: ["22"]
-    description: "Allows SSH from trusted admin IP ranges to management VMs."
+    description: "Allows SSH access to VMs tagged 'iap-ssh' via Google Cloud IAP (Identity-Aware Proxy)."
+    labels:
+      environment: "production"
+      owner: "security-team"
+      service: "iap-access"
 
-  - name: allow-gke-to-databases 
-    network: sample-vpc
+  # Critical for GKE cluster operation
+  allow-gke-control-plane-communication:
+    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
     direction: INGRESS
-    priority: 200 
+    priority: 1
     action: ALLOW
-    source_service_accounts: ["gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"] # sample with SA
-    # source_ranges:
-    #   - 10.0.2.0/23  # GKE Node IPs 
-    #   - 10.0.4.0/21  # GKE Pod IPs
-    target_ranges:
-      - 10.0.1.0/24  # Database subnet
+    # These ranges are specific to the GKE control plane within Google's managed network
+    # and must be allowed for the control plane to communicate with nodes.
+    # Google publishes these ranges, but using the GKE-specific target tags is often easier.
+    source_ranges:
+      - "35.191.0.0/16" # GKE control plane outbound
+      - "130.211.0.0/22" # GKE control plane outbound
+    target_tags: ["gke-node"] # Target your GKE nodes
     protocols:
       - protocol: tcp
-        ports: ["5432", "3306", "1433"] # Example: PostgreSQL, MySQL, SQL Server
-    description: "Allows GKE nodes/pods to connect to database instances."
+        ports: ["10250", "443"] # Kubelet API, HTTPS
+    description: "Allows GKE control plane to communicate with worker nodes. Critical for cluster functionality."
+    labels:
+      environment: "production"
+      owner: "gke-admin"
+      service: "gke-control-plane"
 
-  - name: allow-internal-all-subnets # General internal communication within the VPC
-    network: sample-vpc
+  # Application-Specific Ingress Rules
+  allow-gke-to-databases:
+    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
     direction: INGRESS
-    priority: 300 
+    priority: 200
+    action: ALLOW
+    # Production Best Practice: Use specific subnets for source/target if possible,
+    # or leverage service accounts if only specific service accounts should initiate traffic.
+    # If source_service_accounts is desired, use it like this:
+    # source_service_accounts: ["gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"]
+    source_ranges:
+      - "10.0.2.0/23" # GKE Node IPs 
+      - "10.0.4.0/21" # GKE Pod IPs
+      - "10.0.10.0/23" # GKE Services IPs
+    target_ranges:
+      - "10.0.1.0/24" # Database subnet CIDR
+    protocols:
+      - protocol: tcp
+        ports: ["5432", "3306", "1433", "6379"] # PostgreSQL, MySQL, SQL Server, Redis
+    description: "Allows traffic from GKE nodes/pods to the database subnet on specified database ports."
+    labels:
+      environment: "production"
+      owner: "app-team"
+      application: "gke"
+      service: "database-connectivity"
+      
+  # internal VPC communication
+  allow-internal-all-subnets:
+    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
+    direction: INGRESS
+    priority: 300
     action: ALLOW
     source_ranges:
-      - 10.0.0.0/8 #e.g., ["10.0.0.0/24", "10.0.1.0/24", ...]
+      - "10.0.0.0/8" 
     target_ranges:
-      - 10.0.0.0/8 # Same as source
+      - "10.0.0.0/8"
     protocols:
       - protocol: tcp
-        ports: ["0-65535"] 
+        ports: ["0-65535"]
       - protocol: udp
         ports: ["0-65535"]
-      - protocol: icmp   
-    description: "Allows all TCP/UDP/ICMP communication between internal subnets."
+      - protocol: icmp
+    description: "Allows all TCP/UDP/ICMP communication between internal subnets within the 'sample-vpc'."
+    labels:
+      environment: "production"
+      owner: "network-team"
+      service: "internal-connectivity"
 
-
-  # ------------------------------------------------------------------------
-  # Health Check Rules (Required for Load Balancers)
-  # GCP Load Balancers use specific IP ranges for health checks.
-  # ------------------------------------------------------------------------
-
-  - name: allow-lb-health-checks
-    network: sample-vpc
+  # Load Balancer Health Check Rules (Required for Load Balancers)
+  allow-lb-health-checks: # Allows Google Cloud Load Balancer health probes
+    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
     direction: INGRESS
     priority: 500
     action: ALLOW
     source_ranges:
-      - 35.191.0.0/16 # Ranges for external HTTP(S), SSL Proxy, TCP Proxy LB health checks
-      - 130.211.0.0/22 # Ranges for all Load Balancer health checks
-    # Target should be the instances that the LB will check (e.g., your GKE nodes, VMs)
-    # Using a common tag for all LB backends
-    #target_tags: ["gke-node", "application-backend"] # Example tags. Add tags that your GKE nodes/VMs will have.
-    target_service_accounts:
-      - "gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com" #sample using SA
+      - "35.191.0.0/16" # Ranges for external HTTP(S), SSL Proxy, TCP Proxy LB health checks
+      - "130.211.0.0/22" # Ranges for all Load Balancer health checks
+      - "209.85.152.0/22" # Additional range for Internal TCP/UDP Load Balancer health checks
+      - "209.85.204.0/22" # Additional range for Internal TCP/UDP Load Balancer health checks
+      # These ranges are published by Google and should be kept up to date.
+    # Target can be specific tags (e.g., 'gke-node', 'application-backend')
+    # or specific service accounts if more granular targeting is needed.
+    # For GKE, target_tags on the node pool is often easiest.
+    target_tags: ["gke-node", "application-backend", "management-server"]
+    # If target_service_accounts is preferred:
+    # target_service_accounts: ["gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"]
     protocols:
       - protocol: tcp
-        ports: ["80", "443", "8080"] # Common application ports for health checks. Adjust as needed.
-    description: "Allows Google Cloud Load Balancer health check probes."
+        ports: ["80", "443", "8080", "8443", "10250"]
+    description: "Allows Google Cloud Load Balancer health check probes to target backends."
+    labels:
+      environment: "production"
+      owner: "network-team"
+      service: "load-balancer"
 
-  - name: allow-egress-to-internet # outbound connections to the internet
-    network: sample-vpc
+  # ------------------------------------------------------------------------
+  # Egress Rules (Outbound Traffic)
+  # ------------------------------------------------------------------------
+
+  allow-egress-to-internet: # Outbound connections to the internet
+    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
     direction: EGRESS
-    priority: 1000 # Lower priority than internal rules
+    priority: 1000 # Default priority for general outbound rules
     action: ALLOW
-    destination_ranges: ["0.0.0.0/0"] 
-    # If using Cloud NAT, VMs without public IPs will rely on NAT, this rule applies to VMs with public IPs.
-    target_tags: ["outbound-internet", "management-server"]
+    destination_ranges: ["0.0.0.0/0"] # Allows outbound to all external IPs
+    # Target specific instances/tags that should have internet access.
+    # VMs without public IPs will rely on Cloud NAT for internet egress if configured.
+    # This rule primarily applies to VMs with public IPs or those that directly need egress.
+    target_tags: ["outbound-internet", "management-server", "gke-node"] # Instances needing internet access
     protocols:
       - protocol: tcp
-        ports: ["80", "443", "53"] 
+        ports: ["80", "443", "53"] # HTTP, HTTPS, DNS
       - protocol: udp
-        ports: ["53"]            
-      - protocol: icmp     
-    description: "Allows specified instances to make outbound connections to the internet."
-    # DEFAULT 
-  - name: deny-all-other-ingress
-    network: sample-vpc
+        ports: ["53"] # DNS
+      - protocol: icmp # Ping and other ICMP uses
+    description: "Allows specified instances to make outbound connections to the internet on common ports."
+    labels:
+      environment: "production"
+      owner: "network-team"
+      service: "internet-egress"
+
+  # ------------------------------------------------------------------------
+  # Catch-All Deny Rules (Critical for Security)
+  # These ensure that anything not explicitly allowed is denied.
+  # ------------------------------------------------------------------------
+
+  deny-all-other-ingress: # Explicitly deny all other inbound traffic
+    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
     direction: INGRESS
-    priority: 65534 # evaluated last for ingress
+    priority: 65534 # High number to ensure it's evaluated last for ingress
     action: DENY
     source_ranges: ["0.0.0.0/0"] # From anywhere
-    target_ranges: ["0.0.0.0/0"]
+    destination_ranges: ["0.0.0.0/0"] # To anywhere (within the network)
     protocols:
-      - protocol: all
-    description: "Explicitly denies all inbound traffic not explicitly allowed by higher priority rules."
+      - protocol: all # Deny all protocols
+    description: "Explicitly denies all inbound traffic not explicitly allowed by higher priority rules. Critical for 'deny by default' security."
+    labels:
+      environment: "production"
+      owner: "security-team"
+      service: "deny-default"
+
+  deny-all-other-egress: # Explicitly deny all other outbound traffic
+    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
+    direction: EGRESS
+    priority: 65534 # Same high number to ensure it's evaluated last for egress
+    action: DENY
+    source_ranges: ["0.0.0.0/0"] # From anywhere (within the network)
+    destination_ranges: ["0.0.0.0/0"] # To anywhere
+    protocols:
+      - protocol: all # Deny all protocols
+    description: "Explicitly denies all outbound traffic not explicitly allowed by higher priority rules. Critical for 'deny by default' security."
+    labels:
+      environment: "production"
+      owner: "security-team"
+      service: "deny-default"
+
+  # ------------------------------------------------------------------------
+  # Essential GCP Default-like Rules (often implicitly created or best to define)
+  # ------------------------------------------------------------------------
+
+  allow-internal-icmp: # Allow ICMP for internal network diagnostics
+    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
+    direction: INGRESS
+    priority: 400
+    action: ALLOW
+    source_ranges: ["10.0.0.0/8"]
+    target_ranges: ["10.0.0.0/8"]
+    protocols:
+      - protocol: icmp
+    description: "Allows internal ICMP traffic for basic network diagnostics (ping)."
+    labels:
+      environment: "production"
+      owner: "network-team"
+      service: "internal-diagnostics"
+
+
 

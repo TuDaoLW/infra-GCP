@@ -5,9 +5,7 @@ compute_instances:
     zone: asia-southeast1-a
     machine_type: e2-small
     description: "Management VM for administrative tasks and tooling"
-
     service_account: management-vm-sa
-
     disks:
       - device_name: boot-disk 
         boot: true
@@ -62,10 +60,9 @@ compute_instances:
       - "management-server"
       - "ssh-allowed"
       - "outbound-http"
+      - "iap-ssh"
 
-    labels:
-      environment: "production"
-      owner: "operations"
+    extra_labels:
       application: "management-tools"
       service: "ssh-gateway"
 

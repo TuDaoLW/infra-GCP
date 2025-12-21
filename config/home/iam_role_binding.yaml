@@ -11,7 +11,7 @@ iam_role_bindings:
       # title: "temporary-access"
       # expression: "request.time < timestamp(\"2024-12-31T23:59:59Z\")"
       # description: "Temporary access for management VM during migration phase."
-    labels:
+    extra_labels:
       environment: "production"
       owner: "operations"
       binding-type: "custom-role"
@@ -27,9 +27,7 @@ iam_role_bindings:
     # Production Recommendation: Consider binding this at the specific bucket level for more security:
     # resource_id: "my-app-bucket-name"
     # resource_type: "bucket"
-    labels:
-      environment: "production"
-      owner: "app-dev-team"
+    extra_labels:
       binding-type: "predefined-role"
 
   # Binding for Workload Identity: Allow KSA to Impersonate GSA for My App
@@ -43,9 +41,7 @@ iam_role_bindings:
     resource_id: "my-app-gsa@adroit-nimbus-481707-i0.iam.gserviceaccount.com" # The GSA being impersonated
     resource_type: "serviceAccount" # Google Service Account
     description: "Enables Kubernetes Service Account 'default/my-app-ksa' to impersonate 'my-app-gsa' via Workload Identity."
-    labels:
-      environment: "production"
-      owner: "gke-admin"
+    extra_labels:
       binding-type: "workload-identity"
 
   # GKE Node Pool Access (if not using Autopilot)
@@ -58,7 +54,7 @@ iam_role_bindings:
   #   resource_id: "adroit-nimbus-481707-i0"
   #   resource_type: "project"
   #   description: "Grants essential permissions for GKE worker nodes (e.g., to register with the control plane, pull images)."
-  #   labels: { environment: "production", owner: "gke-admin", binding-type: "predefined-role" }
+  #   extra_labels: { binding-type: "predefined-role" }
 
   # - name: gke-node-logging-binding
   #   role: "roles/logging.logWriter"
@@ -67,7 +63,7 @@ iam_role_bindings:
   #   resource_id: "adroit-nimbus-481707-i0"
   #   resource_type: "project"
   #   description: "Allows GKE worker nodes to write logs to Cloud Logging."
-  #   labels: { environment: "production", owner: "gke-admin", binding-type: "predefined-role" }
+  #   extra_labels: { binding-type: "predefined-role" }
 
   # - name: gke-node-monitoring-binding
   #   role: "roles/monitoring.metricWriter"
@@ -76,7 +72,7 @@ iam_role_bindings:
   #   resource_id: "adroit-nimbus-481707-i0"
   #   resource_type: "project"
   #   description: "Allows GKE worker nodes to write metrics to Cloud Monitoring."
-  #   labels: { environment: "production", owner: "gke-admin", binding-type: "predefined-role" }
+  #   extra_labels: { binding-type: "predefined-role" }
 
 
   # Bind predefined role to Cloud Run service account
@@ -87,9 +83,7 @@ iam_role_bindings:
     resource_id: "adroit-nimbus-481707-i0"
     resource_type: "project"
     description: "Grants Cloud Run service account 'cloud-run-sa' read access to Cloud Run service configurations."
-    labels:
-      environment: "production"
-      owner: "serverless-dev-team"
+    extra_labels:
       binding-type: "predefined-role"
 
   # Example: If Cloud Run needs to write to a database or GCS, bind specific roles here.
@@ -100,7 +94,7 @@ iam_role_bindings:
   #   resource_id: "my-cloud-run-data-bucket" # Bind at the bucket level for granular access
   #   resource_type: "bucket"
   #   description: "Allows Cloud Run service to create objects in a specific storage bucket."
-  #   labels: { environment: "production", owner: "serverless-dev-team", binding-type: "predefined-role" }
+  #   extra_labels: { binding-type: "predefined-role" }
 
   # Example: Granting a predefined role to a human user or group
   # - name: admin-team-editor-binding
@@ -115,4 +109,4 @@ iam_role_bindings:
   #     title: "access-from-trusted-network"
   #     expression: "request.matchIP('203.0.113.0/24')" # Only allow if source IP is from trusted range
   #     description: "Editor access only from the corporate network."
-  #   labels: { environment: "production", owner: "security-team", binding-type: "human-access" }
+  #   extra_labels: { binding-type: "human-access" }

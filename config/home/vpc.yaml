@@ -1,19 +1,14 @@
 ---
 vpc_networks:
-  - name: sample-vpc
+  sample-vpc:
     project_id: adroit-nimbus-481707-i0
     auto_create_subnetworks: false # custom subnets
     routing_mode: REGIONAL # Or GLOBAL
     mtu: 1460
     description: "VPC network for core services and applications"
-    # Tags are used for firewall rules and route targeting
-    # Labels are for resource organization and cost management
     tags:
       - "costcenter-main" # Example tag
-    labels:
-      environment: "production" 
-      owner: "network-team"     
-      application: "core-services"
+    # extra_labels:
 
     subnets:
       - name: management
@@ -21,9 +16,8 @@ vpc_networks:
         ip_cidr_range: 10.0.0.0/24
         private_ip_google_access: true # Enable Private Google Access
         description: "Subnet for management VMs and tools"
-        labels:
-          environment: "production"
-          tier: "management"
+        # extra_labels:
+        #   tier: "management"
         tags:
           - "management-access" # tag for firewall rules
 
@@ -32,9 +26,8 @@ vpc_networks:
         ip_cidr_range: 10.0.1.0/24
         private_ip_google_access: true
         description: "Subnet for database instances (e.g., Cloud SQL, self-managed databases)"
-        labels:
-          environment: "production"
-          tier: "database"
+        # extra_labels:
+        #   tier: "database"
         tags:
           - "database-access"
 
@@ -43,10 +36,9 @@ vpc_networks:
         ip_cidr_range: 10.0.2.0/23
         private_ip_google_access: true
         description: "Primary subnet for GKE cluster nodes"
-        labels:
-          environment: "production"
-          application: "gke"
-          tier: "compute"
+        # extra_labels:
+        #   application: "gke"
+        #   tier: "compute"
         secondary_ip_ranges:
           - range_name: gke-pods
             ip_cidr_range: 10.0.4.0/21
@@ -60,9 +52,8 @@ vpc_networks:
         ip_cidr_range: 10.0.6.0/24
         private_ip_google_access: false
         description: "Subnet for Serverless VPC Access for Cloud Run"
-        labels:
-          environment: "production"
-          application: "serverless"
+        # extra_labels:
+        #   application: "serverless"
         tags:
           - "cloudrun-connector"
 
@@ -71,9 +62,8 @@ vpc_networks:
         ip_cidr_range: 10.0.7.0/24
         private_ip_google_access: false
         description: "Subnet for general purpose Compute Engine VMs"
-        labels:
-          environment: "production"
-          tier: "compute"
+        # extra_labels:
+        #   tier: "compute"
         tags:
           - "general-vm"
 
@@ -84,8 +74,8 @@ vpc_networks:
         role: ACTIVE # Indicates this is an active proxy subnet
         private_ip_google_access: false
         description: "Dedicated proxy-only subnet for internal HTTP(S) Load Balancers"
-        labels:
-          environment: "production"
-          tier: "networking"
+        # extra_labels:
+        #   tier: "networking"
         tags:
           - "lb-proxy"
+
