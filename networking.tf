@@ -26,3 +26,18 @@ module "nat" {
   routers      = try(local.config.cloud_routers, {})
   nat_gateways = { (each.key) = each.value } 
 }
+
+module "firewalls" {
+  for_each = {
+    for vpc_name, _ in try(local.config.vpc_networks, {}) :
+    vpc_name => true
+    if length(try(local.config.firewall_rules, {})) > 0
+  }
+
+  source = "./module/firewall"
+
+  project_id        = var.project_id
+  network_self_link = module.vpcs[each.key].vpc_self_link
+
+  rules = try(local.config.firewall_rules, {})
+}
