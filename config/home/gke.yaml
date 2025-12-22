@@ -54,34 +54,34 @@ gke_clusters:
     # --- Cluster Mode: Autopilot vs. Standard ---
     # Set to 'true' for a hands-off, fully managed experience.
     # Set to 'false' to manage your own node pools for more control (see 'node_pools' below).
-    enable_autopilot: true
+    enable_autopilot: false
 
     # --- Node Pool Configuration (for Standard mode: enable_autopilot = false) ---
     # If using Standard mode, you must define at least one node pool.
-    # node_pools:
-    #   - name: default-node-pool
-    #     initial_node_count: 2
-    #     node_config:
-    #       machine_type: e2-medium
-    #       disk_size_gb: 100
-    #       service_account: "gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
-    #       oauth_scopes:
-    #         - "https://www.googleapis.com/auth/cloud-platform"
-    #       shielded_instance_config: # Recommended: Enhances node security.
-    #         enable_secure_boot: true
-    #         enable_integrity_monitoring: true
-    #       labels: # For workload scheduling
-    #         workload-type: "general-purpose"
-    #       taints: # To control which pods can run on these nodes
-    #         - key: "app"
-    #           value: "critical"
-    #           effect: "NO_SCHEDULE"
-    #     management:
-    #       auto_repair: true
-    #       auto_upgrade: true
-    #     autoscaling:
-    #       min_node_count: 1
-    #       max_node_count: 5
+    node_pools:
+      - name: default-node-pool
+        initial_node_count: 2
+        node_config:
+          machine_type: e2-medium
+          disk_size_gb: 100
+          service_account: "gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
+          oauth_scopes:
+            - "https://www.googleapis.com/auth/cloud-platform"
+          shielded_instance_config: # Recommended: Enhances node security.
+            enable_secure_boot: true
+            enable_integrity_monitoring: true
+          labels: # For workload scheduling
+            workload-type: "general-purpose"
+          taints: # To control which pods can run on these nodes
+            - key: "app"
+              value: "critical"
+              effect: "NO_SCHEDULE"
+        management:
+          auto_repair: true
+          auto_upgrade: true
+        autoscaling:
+          min_node_count: 1
+          max_node_count: 5
 
     #   - name: gpu-node-pool
     #     initial_node_count: 1
