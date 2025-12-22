@@ -1,6 +1,6 @@
 ---
 service_accounts:
-  - name: management-vm-sa 
+  management-vm-sa: 
     account_id: management-vm-sa # (management-vm-sa@project-id.iam.gserviceaccount.com)
     display_name: "Service Account for Management VM" 
     description: "Used by the management VM for OS Login, logging, monitoring, and script access to Google Cloud services."
@@ -9,7 +9,7 @@ service_accounts:
       application: "management"
 
   # Service Account for GKE nodes (if not using Autopilot, or for specific workloads in Standard)
-  - name: gke-node-sa
+  gke-node-sa:
     account_id: gke-node-sa
     display_name: "Service Account for GKE Nodes"
     description: "Used by GKE worker nodes to access Google Cloud APIs (e.g., pulling images, writing logs)."
@@ -19,7 +19,7 @@ service_accounts:
 
   # Service Account for application pods in GKE (using Workload Identity)
   # This GSA would be bound to a Kubernetes Service Account.
-  - name: my-app-gsa
+  my-app-gsa:
     account_id: my-app-gsa
     display_name: "Service Account for My Application in GKE"
     description: "Used by specific application pods in GKE via Workload Identity to access GCP services."
@@ -27,7 +27,7 @@ service_accounts:
     extra_labels:
       application: "my-app-name"
 
-  - name: cloud-run-sa
+  cloud-run-sa:
     account_id: cloud-run-sa
     display_name: "Service Account for Cloud Run Services"
     description: "Used by Cloud Run services to access backend GCP services securely (e.g., Cloud SQL, Storage, Pub/Sub)."

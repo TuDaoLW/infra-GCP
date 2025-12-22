@@ -1,6 +1,6 @@
 ---
-iam_custom_roles:
-  - name: management-vm-operator-role 
+iam_roles:
+  management-vm-operator-role:
     role_id: managementVmOperator # The ID of the custom role (max 64 lowercase alphanumeric chars)
     title: "Management VM Operator" 
     # It will then be available for use within this project.

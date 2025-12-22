@@ -27,24 +27,6 @@ firewall_rules:
         ports: ["22"]
     description: "Allows SSH access to VMs tagged 'iap-ssh' via Google Cloud IAP (Identity-Aware Proxy)."
 
-  # Critical for GKE cluster operation
-  allow-gke-control-plane-communication:
-    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
-    direction: INGRESS
-    priority: 1
-    action: ALLOW
-    # These ranges are specific to the GKE control plane within Google's managed network
-    # and must be allowed for the control plane to communicate with nodes.
-    # Google publishes these ranges, but using the GKE-specific target tags is often easier.
-    source_ranges:
-      - "35.191.0.0/16" # GKE control plane outbound
-      - "130.211.0.0/22" # GKE control plane outbound
-    target_tags: ["gke-node"] # Target your GKE nodes
-    protocols:
-      - protocol: tcp
-        ports: ["10250", "443"] # Kubelet API, HTTPS
-    description: "Allows GKE control plane to communicate with worker nodes. Critical for cluster functionality."
-
   # Application-Specific Ingress Rules
   allow-gke-to-databases:
     network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
@@ -57,8 +39,8 @@ firewall_rules:
     # source_service_accounts: ["gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"]
     source_ranges:
       - "10.0.2.0/23" # GKE Node IPs 
-      - "10.0.4.0/21" # GKE Pod IPs
-      - "10.0.10.0/23" # GKE Services IPs
+      - "10.1.0.0/20" # GKE Pod IPs
+      - "10.2.0.0/20" # GKE Services IPs
     target_ranges:
       - "10.0.1.0/24" # Database subnet CIDR
     protocols:
@@ -114,7 +96,7 @@ firewall_rules:
   allow-egress-to-internet: # Outbound connections to the internet
     network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
     direction: EGRESS
-    priority: 1000 # Default priority for general outbound rules
+    priority: 1100 # Default priority for general outbound rules
     action: ALLOW
     destination_ranges: ["0.0.0.0/0"] # Allows outbound to all external IPs
     # Target specific instances/tags that should have internet access.
@@ -170,6 +152,4 @@ firewall_rules:
     protocols:
       - protocol: icmp
     description: "Allows internal ICMP traffic for basic network diagnostics (ping)."
-
-
 

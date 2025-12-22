@@ -26,13 +26,12 @@ gke_clusters:
         #   cidr_block: "YOUR_VPN_IP_RANGE"
     workload_identity_config:
       workload_pool: "adroit-nimbus-481707-i0.svc.id.goog"
-    database_encryption: # R: Encrypts secrets at the application layer with a CMEK.
-      state: "ENCRYPTED"
-      key_name: "projects/adroit-nimbus-481707-i0/locations/asia-southeast1/keyRings/gke-keyring/cryptoKeys/gke-secrets-key"
+    # database_encryption: # R: Encrypts secrets at the application layer with a CMEK., need to create key
+    #   state: "ENCRYPTED"
+    #   key_name: "projects/adroit-nimbus-481707-i0/locations/asia-southeast1/keyRings/gke-keyring/cryptoKeys/gke-secrets-key"
     # binary_authorization: # R: Enforce that only trusted container images are deployed.
     #   evaluation_mode: "PROJECT_SINGLETON_POLICY_ENFORCE"
 
-    # --- Observability and Addons ---
     logging_config:
       enable_system_components: true
       enable_workload_components: false # Enable for application logs

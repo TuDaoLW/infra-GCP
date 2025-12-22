@@ -8,7 +8,6 @@ vpc_networks:
     description: "VPC network for core services and applications"
     tags:
       - "costcenter-main" # Example tag
-    # extra_labels:
 
     subnets:
       - name: management
@@ -16,8 +15,6 @@ vpc_networks:
         ip_cidr_range: 10.0.0.0/24
         private_ip_google_access: true # Enable Private Google Access
         description: "Subnet for management VMs and tools"
-        # extra_labels:
-        #   tier: "management"
         tags:
           - "management-access" # tag for firewall rules
 
@@ -26,8 +23,6 @@ vpc_networks:
         ip_cidr_range: 10.0.1.0/24
         private_ip_google_access: true
         description: "Subnet for database instances (e.g., Cloud SQL, self-managed databases)"
-        # extra_labels:
-        #   tier: "database"
         tags:
           - "database-access"
 
@@ -36,14 +31,11 @@ vpc_networks:
         ip_cidr_range: 10.0.2.0/23
         private_ip_google_access: true
         description: "Primary subnet for GKE cluster nodes"
-        # extra_labels:
-        #   application: "gke"
-        #   tier: "compute"
         secondary_ip_ranges:
           - range_name: gke-pods
-            ip_cidr_range: 10.0.4.0/21
+            ip_cidr_range: 10.1.0.0/20
           - range_name: gke-services
-            ip_cidr_range: 10.0.10.0/23
+            ip_cidr_range: 10.50.0.0/17
         tags:
           - "gke-nodes"
 
@@ -52,8 +44,6 @@ vpc_networks:
         ip_cidr_range: 10.0.6.0/24
         private_ip_google_access: false
         description: "Subnet for Serverless VPC Access for Cloud Run"
-        # extra_labels:
-        #   application: "serverless"
         tags:
           - "cloudrun-connector"
 
@@ -62,20 +52,16 @@ vpc_networks:
         ip_cidr_range: 10.0.7.0/24
         private_ip_google_access: false
         description: "Subnet for general purpose Compute Engine VMs"
-        # extra_labels:
-        #   tier: "compute"
         tags:
           - "general-vm"
 
       - name: loadbalancer-proxy
         region: asia-southeast1
-        ip_cidr_range: 10.0.255.0/28
+        ip_cidr_range: 10.129.0.0/23
         purpose: REGIONAL_MANAGED_PROXY # This is correct for internal HTTP(S) Load Balancers
         role: ACTIVE # Indicates this is an active proxy subnet
         private_ip_google_access: false
         description: "Dedicated proxy-only subnet for internal HTTP(S) Load Balancers"
-        # extra_labels:
-        #   tier: "networking"
         tags:
           - "lb-proxy"
 

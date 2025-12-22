@@ -1,6 +1,6 @@
 ---
 iam_role_bindings:
-  - name: management-vm-operator-binding # Unique identifier 
+  management-vm-operator-binding: # Unique identifier 
     role: "projects/adroit-nimbus-481707-i0/roles/managementVmOperator"
     members:
       - "serviceAccount:management-vm-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
@@ -17,7 +17,7 @@ iam_role_bindings:
       binding-type: "custom-role"
 
   # Binding for GKE Application Service Account to Read Storage (for pod)
-  - name: my-app-gsa-storage-reader-binding
+  my-app-gsa-storage-reader-binding:
     role: "roles/storage.objectViewer" # Predefined role
     members:
       - "serviceAccount:my-app-gsa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
@@ -31,7 +31,7 @@ iam_role_bindings:
       binding-type: "predefined-role"
 
   # Binding for Workload Identity: Allow KSA to Impersonate GSA for My App
-  - name: workload-identity-my-app-binding
+  workload-identity-my-app-binding:
     # This role binding is applied ON the Google Service Account itself (my-app-gsa),
     # NOT the project. This is a critical distinction for Workload Identity.
     role: "roles/iam.workloadIdentityUser" # Special IAM role for Workload Identity
@@ -47,7 +47,7 @@ iam_role_bindings:
   # GKE Node Pool Access (if not using Autopilot)
   # For Standard GKE clusters, these are essential for node functionality.
   # For Autopilot, the underlying nodes are managed by Google and you primarily use Workload Identity for workloads.
-  # - name: gke-node-pool-access-binding
+  # gke-node-pool-access-binding:
   #   role: "roles/container.nodeServiceAccount" # Predefined GKE node service account role
   #   members:
   #     - "serviceAccount:gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
@@ -56,7 +56,7 @@ iam_role_bindings:
   #   description: "Grants essential permissions for GKE worker nodes (e.g., to register with the control plane, pull images)."
   #   extra_labels: { binding-type: "predefined-role" }
 
-  # - name: gke-node-logging-binding
+  # gke-node-logging-binding:
   #   role: "roles/logging.logWriter"
   #   members:
   #     - "serviceAccount:gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
@@ -65,7 +65,7 @@ iam_role_bindings:
   #   description: "Allows GKE worker nodes to write logs to Cloud Logging."
   #   extra_labels: { binding-type: "predefined-role" }
 
-  # - name: gke-node-monitoring-binding
+  # gke-node-monitoring-binding:
   #   role: "roles/monitoring.metricWriter"
   #   members:
   #     - "serviceAccount:gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
@@ -76,7 +76,7 @@ iam_role_bindings:
 
 
   # Bind predefined role to Cloud Run service account
-  - name: cloud-run-viewer-binding
+  cloud-run-viewer-binding:
     role: "roles/run.viewer" # Example: Read-only access to Cloud Run services metadata
     members:
       - "serviceAccount:cloud-run-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
@@ -87,7 +87,7 @@ iam_role_bindings:
       binding-type: "predefined-role"
 
   # Example: If Cloud Run needs to write to a database or GCS, bind specific roles here.
-  # - name: cloud-run-storage-creator-binding
+  # cloud-run-storage-creator-binding:
   #   role: "roles/storage.objectCreator"
   #   members:
   #     - "serviceAccount:cloud-run-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
@@ -97,7 +97,7 @@ iam_role_bindings:
   #   extra_labels: { binding-type: "predefined-role" }
 
   # Example: Granting a predefined role to a human user or group
-  # - name: admin-team-editor-binding
+  # admin-team-editor-binding:
   #   role: "roles/editor" # A broader role, use with caution and only for trusted admin users/groups
   #   members:
   #     - "user:admin-user@example.com"
