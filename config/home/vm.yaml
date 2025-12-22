@@ -1,8 +1,8 @@
 ---
 compute_instances:
-  - name: management-vm-01
+  management-vm-01: #new format
     project_id: adroit-nimbus-481707-i0
-    zone: asia-southeast1-a
+    zone: asia-southeast1-b
     machine_type: e2-small
     description: "Management VM for administrative tasks and tooling"
     service_account: management-vm-sa
@@ -10,8 +10,6 @@ compute_instances:
       - device_name: boot-disk 
         boot: true
         auto_delete: true
-        disk_encryption_key:
-          kms_key_self_link: "projects/adroit-nimbus-481707-i0/locations/asia-southeast1/keyRings/my-keyring/cryptoKeys/my-boot-key"
         initialize_params:
           image: "projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts" # Full image selfLink
           size_gb: 24
@@ -20,24 +18,19 @@ compute_instances:
       - device_name: data-disk-01
         boot: false
         auto_delete: false
-        disk_encryption_key:
-          kms_key_self_link: "projects/adroit-nimbus-481707-i0/locations/asia-southeast1/keyRings/my-keyring/cryptoKeys/my-data-key"
         initialize_params:
           size_gb: 100
           type: pd-balanced
 
     network_interfaces: # Standardized to snake_case
-      - subnetwork: "projects/adroit-nimbus-481707-i0/regions/asia-southeast1/subnetworks/management-asia-southeast1" # Full subnetwork selfLink recommended
+      - subnetwork: "projects/adroit-nimbus-481707-i0/regions/asia-southeast1/subnetworks/management" # Full subnetwork selfLink recommended
         # Private IP Configuration:
-        # If no network_ip is specified, an ephemeral internal IP is assigned from the subnetwork.
-        # To assign a static internal IP, uncomment and provide the IP or a selfLink to a reserved IP.
-        # network_ip: "10.0.0.10"
+        network_ip: "10.0.0.10"
 
         # Public IP Configuration:
         # access_configs:
-        #   - type: ONE_TO_ONE_NAT # Public IP
+        #   - type: ONE_TO_ONE_NAT
             # For an ephemeral public IP, omit nat_ip.
-            # For static external IP, provide its name or selfLink:
             # nat_ip: "projects/adroit-nimbus-481707-i0/regions/asia-southeast1/addresses/my-static-external-ip"
 
     metadata:
@@ -66,11 +59,10 @@ compute_instances:
       application: "management-tools"
       service: "ssh-gateway"
 
-    # Additional Production Recommendations for a single VM:
     can_ip_forward: false # false unless acting as a NAT gateway or router
     deletion_protection: false
-    confidential_instance_config: # Recommended for sensitive workloads
-      enable_confidential_compute: true
+    confidential_instance_config: # only some specific machine types support this
+      enable_confidential_compute: false
     shielded_instance_config: # Recommended for all production VMs
       enable_secure_boot: true
       enable_vtpm: true

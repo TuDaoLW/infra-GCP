@@ -1,39 +1,52 @@
-# module "gke_clusters" {
-#   for_each = try(local.config.gke_clusters, {})
+module "compute_instances" {
+  source = "./module/vm"
 
-#   source = "./module/gke"
+  project_id = var.project_id
+  labels     = try(local.config.labels, {})
 
-#   name                          = each.key
-#   project_id                    = var.project_id
-#   location                      = each.value.location
-#   description                   = try(each.value.description, null)
+  instances = {
+    for name, inst in try(local.config.compute_instances, {}) :
+    name => {
+      zone         = inst.zone
+      machine_type = inst.machine_type
+      description  = try(inst.description, null)
 
-#   network_self_link             = module.vpcs["sample-vpc"].vpc_self_link  # Adjust if multi-VPC
-#   subnetwork_self_link          = module.vpcs["sample-vpc"].subnets["asia-southeast1/gke-primary"].self_link  # Use correct key
+      service_account = try(inst.service_account, null) != null ? {
+        email  = "${inst.service_account}@${var.project_id}.iam.gserviceaccount.com"
+        scopes = ["cloud-platform"]  # adjust scopes if needed per-instance later
+      } : null
 
-#   cluster_secondary_range_name  = each.value.ip_allocation_policy.cluster_secondary_range_name
-#   services_secondary_range_name = each.value.ip_allocation_policy.services_secondary_range_name
+      tags         = try(inst.tags, [])
+      extra_labels = try(inst.extra_labels, {})
 
-#   release_channel               = try(each.value.release_channel, null)
+      disks = [
+        for d in try(inst.disks, []) : {
+          device_name       = d.device_name
+          boot              = try(d.boot, false)
+          auto_delete       = try(d.auto_delete, true)
+          mode              = try(d.mode, "READ_WRITE")
+          initialize_params = try(d.initialize_params, null)
+        }
+      ]
 
-#   private_cluster_config        = try(each.value.private_cluster_config, null)
-#   master_authorized_networks    = try(each.value.master_authorized_networks_config.cidr_blocks, [])
-#   workload_pool                 = try(each.value.workload_identity_config.workload_pool, null)
-#   database_encryption           = try(each.value.database_encryption, null)
+      network_interfaces = try(inst.network_interfaces, [])
 
-#   logging_components            = try(each.value.logging_config.enable_system_components, true) ? (try(each.value.logging_config.enable_workload_components, false) ? ["SYSTEM_COMPONENTS", "WORKLOADS"] : ["SYSTEM_COMPONENTS"]) : []
+      metadata_startup_script  = try(inst.metadata.startup-script, null)
+      metadata_shutdown_script = try(inst.metadata.shutdown-script, null)
+      metadata                 = {
+        for k, v in try(inst.metadata, {}) : k => v
+        if !contains(["startup-script", "shutdown-script"], k)
+      }
 
-#   monitoring_components         = try(each.value.monitoring_config.enable_system_components, true) ? ["SYSTEM_COMPONENTS"] : []  # Add WORKLOADS if needed later
+      can_ip_forward       = try(inst.can_ip_forward, false)
+      deletion_protection  = try(inst.deletion_protection, false)
 
-#   managed_prometheus_enabled    = try(each.value.monitoring_config.enable_managed_prometheus, false)
-#   cost_allocation_enabled       = try(each.value.cost_management_config.enabled, false)
+      confidential_instance_config = try(inst.confidential_instance_config, {})
+      shielded_instance_config     = try(inst.shielded_instance_config, {})
 
-#   addons = {
-#     http_load_balancing_disabled = try(each.value.addons_config.http_load_balancing.disabled, false)
-#     network_policy_disabled      = try(each.value.addons_config.network_policy_config.disabled, false)
-#   }
+      guest_accelerator = try(inst.guest_accelerator, [])
+    }
+  }
 
-#   maintenance_window_start      = try(each.value.maintenance_policy.daily_maintenance_window.start_time, null)
-
-#   enable_autopilot              = try(each.value.enable_autopilot, false)
-# }
+  depends_on = [module.vpcs, module.firewalls, module.iam_bindings]
+}
