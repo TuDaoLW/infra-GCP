@@ -3,7 +3,7 @@ module "vpcs" {
 
   source = "./module/vpc"
 
-  name                    = each.key  # Now using the map key as name
+  name                    = each.key # Now using the map key as name
   project_id              = var.project_id
   auto_create_subnetworks = try(each.value.auto_create_subnetworks, false)
   routing_mode            = try(each.value.routing_mode, "REGIONAL")
@@ -11,7 +11,7 @@ module "vpcs" {
   description             = try(each.value.description, null)
   tags                    = try(each.value.tags, [])
 
-  subnets                 = each.value.subnets
+  subnets = each.value.subnets
 }
 
 module "nat" {
@@ -20,11 +20,11 @@ module "nat" {
   source = "./module/nat"
 
   project_id        = var.project_id
-  region            = each.value.region 
+  region            = each.value.region
   network_self_link = module.vpcs[each.value.vpc_name].vpc_self_link
 
   routers      = try(local.config.cloud_routers, {})
-  nat_gateways = { (each.key) = each.value } 
+  nat_gateways = { (each.key) = each.value }
 }
 
 module "firewalls" {

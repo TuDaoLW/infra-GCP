@@ -1,6 +1,6 @@
 ---
 iam_role_bindings:
-  management-vm-operator-binding: # Unique identifier 
+  management-vm-operator-binding: # Unique identifier
     role: "projects/adroit-nimbus-481707-i0/roles/managementVmOperator"
     members:
       - "serviceAccount:management-vm-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
@@ -9,7 +9,7 @@ iam_role_bindings:
     description: "Binds the custom Management VM Operator role to the management service account at the project level."
     condition: # Optional: Example (e.g., time-based access), Conditions can't be set on primitive roles.
       title: "temporary-access"
-      expression: "request.time < timestamp(\"2024-12-31T23:59:59Z\")"
+      expression: 'request.time < timestamp("2024-12-31T23:59:59Z")'
       description: "Temporary access for management VM during migration phase."
 
   # Binding for GKE Application Service Account to Read Storage (for pod)
@@ -60,6 +60,14 @@ iam_role_bindings:
     resource_type: "project"
     description: "Allows GKE worker nodes to write metrics to Cloud Monitoring."
 
+  gke-node-default-role-binding:
+    role: "roles/container.defaultNodeServiceAccount"
+    members:
+      - "serviceAccount:gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
+    resource_id: "adroit-nimbus-481707-i0"
+    resource_type: "project"
+    description: "Required minimum role for GKE node service account."
+    
   # Bind predefined role to Cloud Run service account
   cloud-run-viewer-binding:
     role: "roles/run.viewer" # Example: Read-only access to Cloud Run services metadata

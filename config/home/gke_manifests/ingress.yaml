@@ -4,7 +4,7 @@ metadata:
   name: my-internal-ingress
   # Global External Application Load Balancer (Default) none
   annotations:
-    kubernetes.io/ingress.class: "gce-internal"   # Internal Application Load Balancer (VPC-only)
+    kubernetes.io/ingress.class: "gce-internal" # Internal Application Load Balancer (VPC-only)
     # regional external
     # networking.gke.io/load-balancer-type: "External"
     # kubernetes.io/ingress.class: "gce"

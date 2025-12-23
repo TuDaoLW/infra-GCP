@@ -3,12 +3,12 @@ output "instances" {
   value = {
     for name, inst in google_compute_instance.vm :
     name => {
-      id                = inst.id
-      self_link         = inst.self_link
-      instance_id       = inst.instance_id
+      id                 = inst.id
+      self_link          = inst.self_link
+      instance_id        = inst.instance_id
       network_interfaces = inst.network_interface
-      tags              = inst.tags
-      labels            = inst.labels
+      tags               = inst.tags
+      labels             = inst.labels
     }
   }
 }

@@ -47,11 +47,11 @@ resource "google_storage_bucket_iam_member" "bucket" {
     for binding in flatten([
       for k, v in var.role_bindings : [
         for m in v.members : {
-          key           = k
-          member        = m
-          role          = v.role
-          bucket        = v.resource_id
-          condition     = v.condition
+          key       = k
+          member    = m
+          role      = v.role
+          bucket    = v.resource_id
+          condition = v.condition
         }
       ]
       if v.resource_type == "bucket"
@@ -76,7 +76,7 @@ resource "google_service_account_iam_binding" "sa_authoritative" {
   for_each = {
     for k, v in var.role_bindings : k => v
     if v.resource_type == "serviceAccount" &&
-       contains(keys(google_service_account.sa), split("@", v.resource_id)[0])
+    contains(keys(google_service_account.sa), split("@", v.resource_id)[0])
   }
 
   service_account_id = google_service_account.sa[split("@", each.value.resource_id)[0]].name

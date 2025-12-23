@@ -64,4 +64,3 @@ vpc_networks:
         description: "Dedicated proxy-only subnet for internal HTTP(S) Load Balancers"
         tags:
           - "lb-proxy"
-

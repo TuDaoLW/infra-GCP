@@ -46,9 +46,9 @@ variable "subnets" {
     ip_cidr_range            = string
     private_ip_google_access = optional(bool, true)
     description              = optional(string)
-    purpose                  = optional(string)  # e.g., REGIONAL_MANAGED_PROXY
-    role                     = optional(string)  # e.g., ACTIVE
-    tags                     = optional(list(string), [])  # Network tags for firewall targeting
+    purpose                  = optional(string)           # e.g., REGIONAL_MANAGED_PROXY
+    role                     = optional(string)           # e.g., ACTIVE
+    tags                     = optional(list(string), []) # Network tags for firewall targeting
     secondary_ip_ranges = optional(list(object({
       range_name    = string
       ip_cidr_range = string

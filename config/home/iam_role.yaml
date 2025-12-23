@@ -2,33 +2,32 @@
 iam_roles:
   management-vm-operator-role:
     role_id: managementVmOperator
-    title: "Management VM Operator" 
+    title: "Management VM Operator"
     project_id: adroit-nimbus-481707-i0
     stage: GA #(ALPHA, BETA, GA, DISABLED).
     permissions:
-      # "oslogin.users.update" 
-      # "oslogin.sshPublicKeys.get" 
-      # "oslogin.sshPublicKeys.update" 
-      
+      # "oslogin.users.update"
+      # "oslogin.sshPublicKeys.get"
+      # "oslogin.sshPublicKeys.update"
+
       # Logging and Monitoring related permissions
-      - "logging.logEntries.create" 
-      - "monitoring.metricDescriptors.create" 
-      - "monitoring.metricDescriptors.get" 
-      - "monitoring.metricDescriptors.list" 
-      - "monitoring.timeSeries.create" 
+      - "logging.logEntries.create"
+      - "monitoring.metricDescriptors.create"
+      - "monitoring.metricDescriptors.get"
+      - "monitoring.metricDescriptors.list"
+      - "monitoring.timeSeries.create"
       - "iam.serviceAccounts.actAs"
 
       # Cloud Storage access (e.g., for startup scripts, config files)
-      - "storage.objects.get" 
-      - "storage.buckets.get" 
+      - "storage.objects.get"
+      - "storage.buckets.get"
 
       # Compute Engine metadata access (for self-inspection or limited infra querying)
-      - "compute.instances.get" 
+      - "compute.instances.get"
       - "compute.projects.get"
-      - "compute.zones.get" 
+      - "compute.zones.get"
 
       # Service Usage for checking enabled APIs
-      - "serviceusage.services.get" 
-      - "serviceusage.services.list" 
+      - "serviceusage.services.get"
+      - "serviceusage.services.list"
     description: "Grants permissions required for the management VM (bastion host, monitoring agent) to operate securely within the project. Allows OS Login access, writes logs/metrics, and reads from GCS for scripts."
-

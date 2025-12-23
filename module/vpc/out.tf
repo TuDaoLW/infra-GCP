@@ -10,11 +10,11 @@ output "subnets" {
   description = "Map of created subnets with details including tags for firewall use"
   value = { for k, s in google_compute_subnetwork.subnets :
     k => {
-      id                = s.id
-      self_link         = s.self_link
-      gateway_address   = s.gateway_address
-      secondary_ranges  = s.secondary_ip_range
-      tags              = var.subnets[index(var.subnets.*.name, s.name)].tags  # Pass through tags
+      id               = s.id
+      self_link        = s.self_link
+      gateway_address  = s.gateway_address
+      secondary_ranges = s.secondary_ip_range
+      tags             = var.subnets[index(var.subnets.*.name, s.name)].tags # Pass through tags
     }
   }
 }

@@ -7,7 +7,7 @@ compute_instances:
     description: "Management VM for administrative tasks and tooling"
     service_account: management-vm-sa
     disks:
-      - device_name: boot-disk 
+      - device_name: boot-disk
         boot: true
         auto_delete: true
         initialize_params:
@@ -19,7 +19,7 @@ compute_instances:
         boot: false
         auto_delete: false
         initialize_params:
-          size_gb: 100
+          size_gb: 20
           type: pd-balanced
 
     network_interfaces: # Standardized to snake_case
@@ -30,8 +30,8 @@ compute_instances:
         # Public IP Configuration:
         # access_configs:
         #   - type: ONE_TO_ONE_NAT
-            # For an ephemeral public IP, omit nat_ip.
-            # nat_ip: "projects/adroit-nimbus-481707-i0/regions/asia-southeast1/addresses/my-static-external-ip"
+        # For an ephemeral public IP, omit nat_ip.
+        # nat_ip: "projects/adroit-nimbus-481707-i0/regions/asia-southeast1/addresses/my-static-external-ip"
 
     metadata:
       enable-oslogin: "TRUE" # string

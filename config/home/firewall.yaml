@@ -7,13 +7,25 @@ firewall_rules:
   #   priority: 100
   #   action: ALLOW
   #   source_ranges:
-  #     - "YOUR_ADMIN_IP_RANGE_1" 
+  #     - "YOUR_ADMIN_IP_RANGE_1"
   #     - "YOUR_ADMIN_IP_RANGE_2"
   #   target_tags: ["ssh-allowed"] # Applies to VMs tagged 'ssh-allowed'
   #   protocols:
   #     - protocol: tcp
   #       ports: ["22"]
   #   description: "Allows SSH from specified trusted admin IP ranges to VMs with 'ssh-allowed' tag."
+  
+  allow-master-to-nodes:
+    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
+    direction: INGRESS
+    priority: 100  # Higher than denies
+    action: ALLOW
+    source_ranges: ["172.16.0.32/28"]  # Your master_ipv4_cidr_block
+    target_tags: ["gke-node"]  # Or whatever tag your GKE subnet uses for nodes
+    protocols:
+      - protocol: tcp
+        ports: ["443", "10250"]
+    description: "Allows GKE control plane to communicate with nodes (required for private clusters)."
 
   allow-iap-ssh: # Access to VMs with no public IP via IAP, like AWS SSM
     network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
@@ -38,7 +50,7 @@ firewall_rules:
     # If source_service_accounts is desired, use it like this:
     # source_service_accounts: ["gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"]
     source_ranges:
-      - "10.0.2.0/23" # GKE Node IPs 
+      - "10.0.2.0/23" # GKE Node IPs
       - "10.1.0.0/20" # GKE Pod IPs
       - "10.2.0.0/20" # GKE Services IPs
     target_ranges:
@@ -47,7 +59,7 @@ firewall_rules:
       - protocol: tcp
         ports: ["5432", "3306", "1433", "6379"] # PostgreSQL, MySQL, SQL Server, Redis
     description: "Allows traffic from GKE nodes/pods to the database subnet on specified database ports."
-      
+
   # internal VPC communication
   allow-internal-all-subnets:
     network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
@@ -55,7 +67,7 @@ firewall_rules:
     priority: 300
     action: ALLOW
     source_ranges:
-      - "10.0.0.0/8" 
+      - "10.0.0.0/8"
     target_ranges:
       - "10.0.0.0/8"
     protocols:
@@ -152,4 +164,3 @@ firewall_rules:
     protocols:
       - protocol: icmp
     description: "Allows internal ICMP traffic for basic network diagnostics (ping)."
-

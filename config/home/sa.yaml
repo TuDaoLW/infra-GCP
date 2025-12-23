@@ -1,8 +1,8 @@
 ---
 service_accounts:
-  management-vm-sa: 
+  management-vm-sa:
     account_id: management-vm-sa
-    display_name: "Service Account for Management VM" 
+    display_name: "Service Account for Management VM"
     description: "Used by the management VM for OS Login, logging, monitoring, and script access to Google Cloud services."
     project_id: adroit-nimbus-481707-i0
 

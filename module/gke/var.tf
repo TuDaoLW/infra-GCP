@@ -1,108 +1,79 @@
-variable "project_id" {
-  description = "GCP Project ID"
-  type        = string
+variable "name" { type = string }
+variable "project_id" { type = string }
+variable "location" { type = string } # Zone for testing
+variable "description" {
+  type    = string
+  default = null
 }
 
-variable "clusters" {
-  description = "Map of GKE clusters to create (key = cluster name)"
-  type = map(object({
-    location    = string
-    description = optional(string)
+variable "network" { type = string }
+variable "subnetwork" { type = string }
 
-    network    = string
-    subnetwork = string
+variable "ip_allocation_policy" {
+  type = object({
+    cluster_secondary_range_name  = string
+    services_secondary_range_name = string
+  })
+}
 
-    ip_allocation_policy = optional(object({
-      cluster_secondary_range_name  = string
-      services_secondary_range_name = string
-    }), null)
+variable "private_cluster_config" {
+  type = object({
+    enable_private_nodes    = bool
+    enable_private_endpoint = bool
+    master_ipv4_cidr_block  = string
+  })
+}
 
-    release_channel = optional(string, "REGULAR")
+variable "initial_node_count" {
+  type    = number
+  default = 1
+}
 
-    private_cluster_config = optional(object({
-      enable_private_nodes    = optional(bool, true)
-      enable_private_endpoint = optional(bool, true)
-      master_ipv4_cidr_block  = optional(string) # Made optional; required only when private endpoint enabled
-    }), null)
-
-    master_authorized_networks_config = optional(object({
-      enabled = optional(bool, false)
-      cidr_blocks = optional(list(object({
-        display_name = string
-        cidr_block   = string
-      })), [])
-    }), null)
-
-    workload_identity_config = optional(object({
-      workload_pool = optional(string) # Made optional; default provided in root module
-    }), null)
-
-    logging_config = optional(object({
-      enable_system_components   = optional(bool, true)
-      enable_workload_components = optional(bool, false)
-      }), {
-      enable_system_components   = true
-      enable_workload_components = false
-    })
-
-    monitoring_config = optional(object({
-      enable_system_components  = optional(bool, true)
-      enable_managed_prometheus = optional(bool, false)
-      }), {
-      enable_system_components  = true
-      enable_managed_prometheus = false
-    })
-
-    cost_management_config = optional(object({
-      enabled = optional(bool, false)
-    }), { enabled = false })
-
-    addons_config = optional(object({
-      http_load_balancing   = optional(object({ disabled = optional(bool, false) }), {})
-      network_policy_config = optional(object({ disabled = optional(bool, false) }), {})
-    }), {})
-
-    maintenance_policy = optional(object({
-      daily_maintenance_window = optional(object({
-        start_time = optional(string, "03:00") # Made optional with sensible default
-      }), null)
-    }), null)
-
-    enable_autopilot = optional(bool, false)
-
-    node_pools = optional(map(object({
-      initial_node_count = optional(number)
-      node_config = object({
-        machine_type    = string
-        disk_size_gb    = optional(number, 100)
-        service_account = string
-        oauth_scopes    = optional(list(string), ["https://www.googleapis.com/auth/cloud-platform"])
-        shielded_instance_config = optional(object({
-          enable_secure_boot          = optional(bool, true)
-          enable_integrity_monitoring = optional(bool, true)
-        }), {})
-        labels = optional(map(string), {})
-        taints = optional(list(object({
-          key    = string
-          value  = string
-          effect = string
-        })), [])
-      })
-      management = optional(object({
-        auto_repair  = optional(bool, true)
-        auto_upgrade = optional(bool, true)
-      }), {})
-      autoscaling = optional(object({
-        min_node_count = number
-        max_node_count = number
-      }), null)
-    })), {})
-  }))
-  default = {}
+variable "machine_type" {
+  type    = string
+  default = "e2-medium"
+}
+variable "disk_size_gb" {
+  type    = number
+  default = 37
+}
+variable "disk_type" {
+  type    = string
+  default = null
+}
+variable "service_account" { type = string }
+variable "oauth_scopes" {
+  type    = list(string)
+  default = ["https://www.googleapis.com/auth/cloud-platform"]
+}
+variable "spot" {
+  type    = bool
+  default = false
 }
 
 variable "labels" {
-  description = "Optional global labels"
-  type        = map(string)
-  default     = {}
+  type    = map(string)
+  default = {}
+}
+variable "taints" {
+  type    = list(object({ key = string, value = string, effect = string }))
+  default = []
+}
+
+variable "shielded_secure_boot" {
+  type    = bool
+  default = true
+}
+variable "shielded_integrity_monitoring" {
+  type    = bool
+  default = true
+}
+
+variable "release_channel" {
+  type    = string
+  default = "REGULAR"
+}
+variable "deletion_protection" {
+  type    = bool
+  default = true
 }

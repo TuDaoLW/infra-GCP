@@ -7,7 +7,7 @@ spec:
   # This tells the pod to use your configured KSA
   serviceAccountName: my-app-ksa
   containers:
-  - name: my-app-container
-    image: my-app-image
-    # application code inside this container can now automatically
-    # use the permissions of 'my-app-gsa' without any keys.
+    - name: my-app-container
+      image: my-app-image
+      # application code inside this container can now automatically
+      # use the permissions of 'my-app-gsa' without any keys.

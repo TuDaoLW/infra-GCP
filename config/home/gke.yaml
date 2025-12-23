@@ -2,103 +2,27 @@
 gke_clusters:
   cluster-sea1:
     project_id: adroit-nimbus-481707-i0
-    location: asia-southeast1 # A regional cluster, zonal?
-    description: "Primary GKE cluster for application workloads in the asia-southeast1 region."
+    location: asia-southeast1-a # <<< ZONAL for testing (1 node only)
+    description: "Test simple GKE cluster"
 
     network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
     subnetwork: "projects/adroit-nimbus-481707-i0/regions/asia-southeast1/subnetworks/gke-primary"
+
     ip_allocation_policy:
       cluster_secondary_range_name: gke-pods
       services_secondary_range_name: gke-services
 
-    # --- Control Plane and Security Configuration ---
-    release_channel: REGULAR # STABLE
+    release_channel: REGULAR
+
     private_cluster_config:
-      enable_private_nodes: true #Node public IPs
-      enable_private_endpoint: true # Control plane only accessible from within the VPC.
-      master_ipv4_cidr_block: "172.16.0.32/28" # k8s master.
-    master_authorized_networks_config:
-      enabled: true
-      cidr_blocks:
-        - display_name: "management-subnet"
-          cidr_block: "10.0.0.0/24"
-        # - display_name: "corp-vpn-range" #could be my static public IP
-        #   cidr_block: "YOUR_VPN_IP_RANGE"
-    workload_identity_config:
-      workload_pool: "adroit-nimbus-481707-i0.svc.id.goog"
-    # database_encryption: # R: Encrypts secrets at the application layer with a CMEK., need to create key
-    #   state: "ENCRYPTED"
-    #   key_name: "projects/adroit-nimbus-481707-i0/locations/asia-southeast1/keyRings/gke-keyring/cryptoKeys/gke-secrets-key"
-    # binary_authorization: # R: Enforce that only trusted container images are deployed.
-    #   evaluation_mode: "PROJECT_SINGLETON_POLICY_ENFORCE"
+      enable_private_nodes: true
+      enable_private_endpoint: true
+      master_ipv4_cidr_block: "172.16.0.32/28"
 
-    logging_config:
-      enable_system_components: true
-      enable_workload_components: false # Enable for application logs
-    monitoring_config:
-      enable_system_components: true
-      enable_managed_prometheus: false # Managed Prometheus-style metrics collection
-    cost_management_config:
-      enabled: false # Enables cost allocation features for GKE.
-    addons_config:
-      http_load_balancing:
-        disabled: false # For k8s Ingress
-      network_policy_config:
-        disabled: false # For non autopilot
+    service_account: "gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
 
-    # --- Maintenance Configuration ---
-    maintenance_policy:
-      daily_maintenance_window:
-        start_time: "03:00"
+    disk_size_gb: 37
+    machine_type: e2-medium
+    spot: true
 
-    enable_autopilot: false
-
-    # --- Node Pool Configuration (Standard mode) ---
-    node_pools:
-      default-node-pool:
-        initial_node_count: 1
-        node_config:
-          machine_type: e2-medium
-          disk_size_gb: 100
-          service_account: "gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
-          oauth_scopes:
-            - "https://www.googleapis.com/auth/cloud-platform"
-          shielded_instance_config: # Enhances node security.
-            enable_secure_boot: true
-            enable_integrity_monitoring: true
-          labels: # For workload scheduling
-            workload-type: "general-purpose"
-          taints: #control which pods can run on these nodes
-            - key: "app"
-              value: "critical"
-              effect: "NO_SCHEDULE"
-        management:
-          auto_repair: true
-          auto_upgrade: true
-        autoscaling:
-          min_node_count: 1
-          max_node_count: 2
-
-    #   gpu-node-pool:
-    #     initial_node_count: 1
-    #     node_config:
-    #       machine_type: n1-standard-8
-    #       service_account: "gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
-    #       guest_accelerator:
-    #         - type: "nvidia-tesla-p100"
-    #           count: 1
-    #       disk_size_gb: 200
-    #       oauth_scopes:
-    #         - "https://www.googleapis.com/auth/cloud-platform"
-    #       shielded_instance_config:
-    #         enable_secure_boot: true
-    #         enable_integrity_monitoring: true
-    #       labels:
-    #         workload-type: "gpu-intensive"
-    #       taints:
-    #         - key: "gpu"
-    #           value: "true"
-    #           effect: "NO_SCHEDULE"
-    #     management:
-    #       auto_repair: true
-    #       auto_upgrade: true
+    initial_node_count: 1
