@@ -2,25 +2,25 @@
 # Cloud Router Configuration
 cloud_routers:
   asia-southeast1-nat-router:
-    project_id: adroit-nimbus-481707-i0
+    project_id: stone-booking-482114-v1
     vpc_name: "sample-vpc"
     region: asia-southeast1
-    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
+    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
     description: "Cloud Router for Cloud NAT gateway in asia-southeast1."
 
 # --- Cloud NAT Gateway Configuration ---
 cloud_nat_gateways:
   asia-southeast1-public-nat:
-    project_id: adroit-nimbus-481707-i0
+    project_id: stone-booking-482114-v1
     vpc_name: "sample-vpc"
     region: asia-southeast1
     router_name: "asia-southeast1-nat-router" # Reference to the Cloud Router defined above
-    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
+    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
     nat_ip_allocation_mode: "AUTO_ONLY" # AUTO_ONLY for dynamic IP allocation (recommended)
     # Alternatively, for static IPs, you'd specify a list of pre-reserved IP addresses:
     # nat_ips:
-    #   - "projects/adroit-nimbus-481707-i0/regions/asia-southeast1/addresses/nat-ip-01"
-    #   - "projects/adroit-nimbus-481707-i0/regions/asia-southeast1/addresses/nat-ip-02"
+    #   - "projects/stone-booking-482114-v1/regions/asia-southeast1/addresses/nat-ip-01"
+    #   - "projects/stone-booking-482114-v1/regions/asia-southeast1/addresses/nat-ip-02"
     source_subnetwork_ip_ranges_to_nat: "LIST_OF_SUBNETWORKS" # Or "ALL_SUBNETWORKS_ALL_IP_RANGES" for simplicity
     # LIST_OF_SUBNETWORKS is highly recommended for granular control.
     subnetworks:

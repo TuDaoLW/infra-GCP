@@ -17,10 +17,12 @@ module "gke_clusters" {
 
   service_account = each.value.service_account
 
-  disk_size_gb       = try(each.value.disk_size_gb, 37)
-  machine_type       = try(each.value.machine_type, "e2-medium")
-  spot               = try(each.value.spot, false)
-  initial_node_count = try(each.value.initial_node_count, 1)
+  disk_size_gb        = try(each.value.disk_size_gb, 37)
+  machine_type        = try(each.value.machine_type, "e2-medium")
+  spot                = try(each.value.spot, false)
+  deletion_protection = try(each.value.deletion_protection, false)
+  initial_node_count  = try(each.value.initial_node_count, 1)
 
   release_channel = try(each.value.release_channel, "REGULAR")
+  depends_on      = [module.vpcs]
 }

@@ -1,28 +1,30 @@
 ---
 gke_clusters:
   cluster-sea1:
-    project_id: adroit-nimbus-481707-i0
+    project_id: stone-booking-482114-v1
     location: asia-southeast1-a # <<< ZONAL for testing (1 node only)
     description: "Test simple GKE cluster"
-
-    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
-    subnetwork: "projects/adroit-nimbus-481707-i0/regions/asia-southeast1/subnetworks/gke-primary"
-
+    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+    subnetwork: "projects/stone-booking-482114-v1/regions/asia-southeast1/subnetworks/gke-primary"
+    master_authorized_networks_config:
+      cidr_blocks:
+        - display_name: "management-subnet"
+          cidr_block: "10.0.0.0/24"
     ip_allocation_policy:
       cluster_secondary_range_name: gke-pods
       services_secondary_range_name: gke-services
 
     release_channel: REGULAR
-
+    deletion_protection: false
     private_cluster_config:
       enable_private_nodes: true
       enable_private_endpoint: true
       master_ipv4_cidr_block: "172.16.0.32/28"
 
-    service_account: "gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
+    service_account: "gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
 
-    disk_size_gb: 37
+    disk_size_gb: 36
     machine_type: e2-medium
     spot: true
 
-    initial_node_count: 1
+    initial_node_count: 2

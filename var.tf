@@ -7,7 +7,7 @@ variable "env" {
 variable "project_id" {
   description = "GCP Project ID"
   type        = string
-  default     = "adroit-nimbus-481707-i0"
+  default     = "stone-booking-482114-v1"
 }
 
 variable "region" {

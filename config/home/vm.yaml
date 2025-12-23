@@ -1,7 +1,7 @@
 ---
 compute_instances:
   management-vm-01: #new format
-    project_id: adroit-nimbus-481707-i0
+    project_id: stone-booking-482114-v1
     zone: asia-southeast1-b
     machine_type: e2-small
     description: "Management VM for administrative tasks and tooling"
@@ -23,7 +23,7 @@ compute_instances:
           type: pd-balanced
 
     network_interfaces: # Standardized to snake_case
-      - subnetwork: "projects/adroit-nimbus-481707-i0/regions/asia-southeast1/subnetworks/management" # Full subnetwork selfLink recommended
+      - subnetwork: "projects/stone-booking-482114-v1/regions/asia-southeast1/subnetworks/management" # Full subnetwork selfLink recommended
         # Private IP Configuration:
         network_ip: "10.0.0.10"
 
@@ -31,7 +31,7 @@ compute_instances:
         # access_configs:
         #   - type: ONE_TO_ONE_NAT
         # For an ephemeral public IP, omit nat_ip.
-        # nat_ip: "projects/adroit-nimbus-481707-i0/regions/asia-southeast1/addresses/my-static-external-ip"
+        # nat_ip: "projects/stone-booking-482114-v1/regions/asia-southeast1/addresses/my-static-external-ip"
 
     metadata:
       enable-oslogin: "TRUE" # string

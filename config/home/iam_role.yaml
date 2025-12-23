@@ -3,7 +3,7 @@ iam_roles:
   management-vm-operator-role:
     role_id: managementVmOperator
     title: "Management VM Operator"
-    project_id: adroit-nimbus-481707-i0
+    project_id: stone-booking-482114-v1
     stage: GA #(ALPHA, BETA, GA, DISABLED).
     permissions:
       # "oslogin.users.update"

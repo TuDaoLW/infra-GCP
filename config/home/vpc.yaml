@@ -1,7 +1,7 @@
 ---
 vpc_networks:
   sample-vpc:
-    project_id: adroit-nimbus-481707-i0
+    project_id: stone-booking-482114-v1
     auto_create_subnetworks: false # custom subnets
     routing_mode: REGIONAL # Or GLOBAL
     mtu: 1460

@@ -75,5 +75,18 @@ variable "release_channel" {
 }
 variable "deletion_protection" {
   type    = bool
-  default = true
+  default = false
+}
+
+variable "master_authorized_networks_config" {
+  description = "Configuration for master authorized networks"
+  type = object({
+    cidr_blocks = list(object({
+      cidr_block   = string
+      display_name = string
+    }))
+  })
+  default = {
+    cidr_blocks = []
+  }
 }

@@ -1,28 +1,28 @@
 ---
 iam_role_bindings:
-  management-vm-operator-binding: # Unique identifier
-    role: "projects/adroit-nimbus-481707-i0/roles/managementVmOperator"
-    members:
-      - "serviceAccount:management-vm-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
-    resource_id: "adroit-nimbus-481707-i0" # The specific resource this binding applies to
-    resource_type: "project" # The type of resource (e.g., "project", "bucket")
-    description: "Binds the custom Management VM Operator role to the management service account at the project level."
-    condition: # Optional: Example (e.g., time-based access), Conditions can't be set on primitive roles.
-      title: "temporary-access"
-      expression: 'request.time < timestamp("2024-12-31T23:59:59Z")'
-      description: "Temporary access for management VM during migration phase."
+  # management-vm-operator-binding: # Unique identifier
+  #   role: "projects/stone-booking-482114-v1/roles/managementVmOperator"
+  #   members:
+  #     - "serviceAccount:management-vm-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
+  #   resource_id: "stone-booking-482114-v1" # The specific resource this binding applies to
+  #   resource_type: "project" # The type of resource (e.g., "project", "bucket")
+  #   description: "Binds the custom Management VM Operator role to the management service account at the project level."
+  #   condition: # Optional: Example (e.g., time-based access), Conditions can't be set on primitive roles.
+  #     title: "temporary-access"
+  #     expression: 'request.time < timestamp("2024-12-31T23:59:59Z")'
+  #     description: "Temporary access for management VM during migration phase."
 
   # Binding for GKE Application Service Account to Read Storage (for pod)
-  my-app-gsa-storage-reader-binding:
-    role: "roles/storage.objectViewer" # Predefined role
-    members:
-      - "serviceAccount:my-app-gsa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
-    resource_id: "adroit-nimbus-481707-i0"
-    resource_type: "project"
-    description: "Grants GSA 'my-app-gsa' object viewer access to all buckets in the project."
-    # Production Recommendation: Consider binding this at the specific bucket level for more security:
-    # resource_id: "my-app-bucket-name"
-    # resource_type: "bucket"
+  # my-app-gsa-storage-reader-binding:
+  #   role: "roles/storage.objectViewer" # Predefined role
+  #   members:
+  #     - "serviceAccount:my-app-gsa@stone-booking-482114-v1.iam.gserviceaccount.com"
+  #   resource_id: "stone-booking-482114-v1"
+  #   resource_type: "project"
+  #   description: "Grants GSA 'my-app-gsa' object viewer access to all buckets in the project."
+  #   # Production Recommendation: Consider binding this at the specific bucket level for more security:
+  #   # resource_id: "my-app-bucket-name"
+  #   # resource_type: "bucket"
 
   # Binding for Workload Identity: Allow KSA to Impersonate GSA for My App
   workload-identity-my-app-binding:
@@ -30,8 +30,8 @@ iam_role_bindings:
     role: "roles/iam.workloadIdentityUser" # Special IAM role for Workload Identity
     members:
       # Format: 'serviceAccount:PROJECT_ID.svc.id.goog[NAMESPACE/KSA_NAME]'
-      - "serviceAccount:adroit-nimbus-481707-i0.svc.id.goog[default/my-app-ksa]"
-    resource_id: "my-app-gsa@adroit-nimbus-481707-i0.iam.gserviceaccount.com" # The GSA being impersonated
+      - "serviceAccount:stone-booking-482114-v1.svc.id.goog[default/my-app-ksa]"
+    resource_id: "my-app-gsa@stone-booking-482114-v1.iam.gserviceaccount.com" # The GSA being impersonated
     resource_type: "serviceAccount" # Google Service Account
     description: "Enables Kubernetes Service Account 'default/my-app-ksa' to impersonate 'my-app-gsa' via Workload Identity."
 
@@ -39,49 +39,49 @@ iam_role_bindings:
   gke-node-pool-access-binding:
     role: "roles/container.nodeServiceAccount" # Predefined GKE node service account role
     members:
-      - "serviceAccount:gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
-    resource_id: "adroit-nimbus-481707-i0"
+      - "serviceAccount:gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
+    resource_id: "stone-booking-482114-v1"
     resource_type: "project"
     description: "Grants essential permissions for GKE worker nodes (e.g., to register with the control plane, pull images)."
 
   gke-node-logging-binding:
     role: "roles/logging.logWriter"
     members:
-      - "serviceAccount:gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
-    resource_id: "adroit-nimbus-481707-i0"
+      - "serviceAccount:gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
+    resource_id: "stone-booking-482114-v1"
     resource_type: "project"
     description: "Allows GKE worker nodes to write logs to Cloud Logging."
 
   gke-node-monitoring-binding:
     role: "roles/monitoring.metricWriter"
     members:
-      - "serviceAccount:gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
-    resource_id: "adroit-nimbus-481707-i0"
+      - "serviceAccount:gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
+    resource_id: "stone-booking-482114-v1"
     resource_type: "project"
     description: "Allows GKE worker nodes to write metrics to Cloud Monitoring."
 
   gke-node-default-role-binding:
     role: "roles/container.defaultNodeServiceAccount"
     members:
-      - "serviceAccount:gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
-    resource_id: "adroit-nimbus-481707-i0"
+      - "serviceAccount:gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
+    resource_id: "stone-booking-482114-v1"
     resource_type: "project"
     description: "Required minimum role for GKE node service account."
     
   # Bind predefined role to Cloud Run service account
-  cloud-run-viewer-binding:
-    role: "roles/run.viewer" # Example: Read-only access to Cloud Run services metadata
-    members:
-      - "serviceAccount:cloud-run-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
-    resource_id: "adroit-nimbus-481707-i0"
-    resource_type: "project"
-    description: "Grants Cloud Run service account 'cloud-run-sa' read access to Cloud Run service configurations."
+  # cloud-run-viewer-binding:
+  #   role: "roles/run.viewer" # Example: Read-only access to Cloud Run services metadata
+  #   members:
+  #     - "serviceAccount:cloud-run-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
+  #   resource_id: "stone-booking-482114-v1"
+  #   resource_type: "project"
+  #   description: "Grants Cloud Run service account 'cloud-run-sa' read access to Cloud Run service configurations."
 
   # Example: If Cloud Run needs to write to a database or GCS, bind specific roles here.
   # cloud-run-storage-creator-binding:
   #   role: "roles/storage.objectCreator"
   #   members:
-  #     - "serviceAccount:cloud-run-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"
+  #     - "serviceAccount:cloud-run-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
   #   resource_id: "my-cloud-run-data-bucket" # Bind at the bucket level for granular access
   #   resource_type: "bucket"
   #   description: "Allows Cloud Run service to create objects in a specific storage bucket."
@@ -92,7 +92,7 @@ iam_role_bindings:
   #   members:
   #     - "user:admin-user@example.com"
   #     - "group:gcp-admins@example.com"
-  #   resource_id: "adroit-nimbus-481707-i0"
+  #   resource_id: "stone-booking-482114-v1"
   #   resource_type: "project"
   #   description: "Grants editor permissions to admin users and groups for the project."
   #   condition: # Example of a condition for human users

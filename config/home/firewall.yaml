@@ -2,7 +2,7 @@
 firewall_rules:
   # Management rules
   # - name: allow-ssh-from-admin-ips # use IAP
-  #   network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
+  #   network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
   #   direction: INGRESS
   #   priority: 100
   #   action: ALLOW
@@ -16,24 +16,37 @@ firewall_rules:
   #   description: "Allows SSH from specified trusted admin IP ranges to VMs with 'ssh-allowed' tag."
   
   allow-master-to-nodes:
-    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
+    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
     direction: INGRESS
     priority: 100  # Higher than denies
     action: ALLOW
     source_ranges: ["172.16.0.32/28"]  # Your master_ipv4_cidr_block
-    target_tags: ["gke-node"]  # Or whatever tag your GKE subnet uses for nodes
+    target_ranges: ["10.0..0/8"]
+    protocols:
+      - protocol: tcp
+        ports: ["443", "10250"]
+    description: "Allows GKE control plane to communicate with nodes (required for private clusters)."
+
+  allow-node-to-master:
+    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+    direction: INGRESS
+    priority: 100  # Higher than denies
+    action: ALLOW
+    source_ranges: ["10.0.0.0/8"]  # Your master_ipv4_cidr_block 
+    target_ranges: ["172.16.0.32/28"]
     protocols:
       - protocol: tcp
         ports: ["443", "10250"]
     description: "Allows GKE control plane to communicate with nodes (required for private clusters)."
 
   allow-iap-ssh: # Access to VMs with no public IP via IAP, like AWS SSM
-    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
+    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
     direction: INGRESS
     priority: 110
     action: ALLOW
     source_ranges: ["35.235.240.0/20"] # Google's IP range for IAP TCP Forwarding
-    target_tags: ["iap-ssh"]
+    # target_tags: ["iap-ssh", "goog-gke-node"]
+    target_ranges: ["10.0..0/8"]
     protocols:
       - protocol: tcp
         ports: ["22"]
@@ -41,14 +54,14 @@ firewall_rules:
 
   # Application-Specific Ingress Rules
   allow-gke-to-databases:
-    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
+    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
     direction: INGRESS
     priority: 200
     action: ALLOW
     # Production Best Practice: Use specific subnets for source/target if possible,
     # or leverage service accounts if only specific service accounts should initiate traffic.
     # If source_service_accounts is desired, use it like this:
-    # source_service_accounts: ["gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"]
+    # source_service_accounts: ["gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"]
     source_ranges:
       - "10.0.2.0/23" # GKE Node IPs
       - "10.1.0.0/20" # GKE Pod IPs
@@ -62,7 +75,7 @@ firewall_rules:
 
   # internal VPC communication
   allow-internal-all-subnets:
-    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
+    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
     direction: INGRESS
     priority: 300
     action: ALLOW
@@ -80,7 +93,7 @@ firewall_rules:
 
   # Load Balancer Health Check Rules (Required for Load Balancers)
   allow-lb-health-checks: # Allows Google Cloud Load Balancer health probes
-    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
+    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
     direction: INGRESS
     priority: 500
     action: ALLOW
@@ -95,7 +108,7 @@ firewall_rules:
     # For GKE, target_tags on the node pool is often easiest.
     target_tags: ["gke-node", "application-backend", "management-server"]
     # If target_service_accounts is preferred:
-    # target_service_accounts: ["gke-node-sa@adroit-nimbus-481707-i0.iam.gserviceaccount.com"]
+    # target_service_accounts: ["gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"]
     protocols:
       - protocol: tcp
         ports: ["80", "443", "8080", "8443", "10250"]
@@ -106,7 +119,7 @@ firewall_rules:
   # ------------------------------------------------------------------------
 
   allow-egress-to-internet: # Outbound connections to the internet
-    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
+    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
     direction: EGRESS
     priority: 1100 # Default priority for general outbound rules
     action: ALLOW
@@ -128,34 +141,34 @@ firewall_rules:
   # These ensure that anything not explicitly allowed is denied.
   # ------------------------------------------------------------------------
 
-  deny-all-other-ingress: # Explicitly deny all other inbound traffic
-    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
-    direction: INGRESS
-    priority: 65534 # High number to ensure it's evaluated last for ingress
-    action: DENY
-    source_ranges: ["0.0.0.0/0"] # From anywhere
-    destination_ranges: ["0.0.0.0/0"] # To anywhere (within the network)
-    protocols:
-      - protocol: all # Deny all protocols
-    description: "Explicitly denies all inbound traffic not explicitly allowed by higher priority rules. Critical for 'deny by default' security."
+  # deny-all-other-ingress: # Explicitly deny all other inbound traffic
+  #   network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+  #   direction: INGRESS
+  #   priority: 65534 # High number to ensure it's evaluated last for ingress
+  #   action: DENY
+  #   source_ranges: ["0.0.0.0/0"] # From anywhere
+  #   destination_ranges: ["0.0.0.0/0"] # To anywhere (within the network)
+  #   protocols:
+  #     - protocol: all # Deny all protocols
+  #   description: "Explicitly denies all inbound traffic not explicitly allowed by higher priority rules. Critical for 'deny by default' security."
 
-  deny-all-other-egress: # Explicitly deny all other outbound traffic
-    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
-    direction: EGRESS
-    priority: 65534 # Same high number to ensure it's evaluated last for egress
-    action: DENY
-    source_ranges: ["0.0.0.0/0"] # From anywhere (within the network)
-    destination_ranges: ["0.0.0.0/0"] # To anywhere
-    protocols:
-      - protocol: all # Deny all protocols
-    description: "Explicitly denies all outbound traffic not explicitly allowed by higher priority rules. Critical for 'deny by default' security."
+  # deny-all-other-egress: # Explicitly deny all other outbound traffic
+  #   network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+  #   direction: EGRESS
+  #   priority: 65534 # Same high number to ensure it's evaluated last for egress
+  #   action: DENY
+  #   source_ranges: ["0.0.0.0/0"] # From anywhere (within the network)
+  #   destination_ranges: ["0.0.0.0/0"] # To anywhere
+  #   protocols:
+  #     - protocol: all # Deny all protocols
+  #   description: "Explicitly denies all outbound traffic not explicitly allowed by higher priority rules. Critical for 'deny by default' security."
 
   # ------------------------------------------------------------------------
   # Essential GCP Default-like Rules (often implicitly created or best to define)
   # ------------------------------------------------------------------------
 
   allow-internal-icmp: # Allow ICMP for internal network diagnostics
-    network: "projects/adroit-nimbus-481707-i0/global/networks/sample-vpc"
+    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
     direction: INGRESS
     priority: 400
     action: ALLOW

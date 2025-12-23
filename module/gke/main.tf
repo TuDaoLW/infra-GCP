@@ -6,7 +6,6 @@ resource "google_container_cluster" "cluster" {
 
   # Keep and configure default node pool
   initial_node_count = var.initial_node_count
-
   node_config {
     machine_type    = var.machine_type
     disk_size_gb    = var.disk_size_gb
@@ -51,6 +50,22 @@ resource "google_container_cluster" "cluster" {
   # Add other configs you need (logging, monitoring, etc.) – keep minimal for now
   release_channel {
     channel = var.release_channel
+  }
+  dynamic "master_authorized_networks_config" {
+    for_each = var.private_cluster_config.enable_private_endpoint ? [1] : []
+    content {
+      # Allow empty cidr_blocks – GKE will only permit access from within the VPC (private endpoint)
+      dynamic "cidr_blocks" {
+        for_each = var.master_authorized_networks_config.cidr_blocks
+        content {
+          cidr_block   = cidr_blocks.value.cidr_block
+          display_name = cidr_blocks.value.display_name
+        }
+      }
+
+      # Optional: Explicitly disable public CIDR access (default false anyway)
+      gcp_public_cidrs_access_enabled = false
+    }
   }
 
   deletion_protection = var.deletion_protection
