@@ -50,3 +50,57 @@ module "compute_instances" {
 
   depends_on = [module.vpcs, module.firewalls, module.iam_bindings]
 }
+
+module "gke_clusters" {
+  source = "./module/gke"
+
+  project_id = var.project_id
+  labels     = try(local.config.labels, {})
+
+  clusters = {
+    for name, cluster in try(local.config.gke_clusters, {}) :
+    name => {
+      location    = cluster.location
+      description = try(cluster.description, null)
+
+      network    = cluster.network
+      subnetwork = cluster.subnetwork
+
+      ip_allocation_policy = try(cluster.ip_allocation_policy, null)
+
+      release_channel = try(cluster.release_channel, "REGULAR")
+
+      private_cluster_config = try(cluster.private_cluster_config, {})
+
+      master_authorized_networks_config = try(cluster.master_authorized_networks_config, {})
+
+      workload_identity_config = try(cluster.workload_identity_config, {
+        workload_pool = "${var.project_id}.svc.id.goog"
+      })
+
+      logging_config = try(cluster.logging_config, {
+        enable_system_components   = true
+        enable_workload_components = false
+      })
+
+      monitoring_config = try(cluster.monitoring_config, {
+        enable_system_components  = true
+        enable_managed_prometheus = false
+      })
+
+      cost_management_config = try(cluster.cost_management_config, { enabled = false })
+
+      addons_config = try(cluster.addons_config, {})
+
+      maintenance_policy = try(cluster.maintenance_policy, {
+        daily_maintenance_window = { start_time = "03:00" }
+      })
+
+      enable_autopilot = try(cluster.enable_autopilot, false)
+
+      node_pools = try(cluster.node_pools, {})
+    }
+  }
+
+  depends_on = [module.vpcs, module.firewalls, module.nat, module.iam_bindings]
+}

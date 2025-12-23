@@ -1,125 +1,108 @@
-variable "name" {
-  description = "Name of the GKE cluster"
-  type        = string
-}
-
 variable "project_id" {
   description = "GCP Project ID"
   type        = string
 }
 
-variable "location" {
-  description = "Location (regional or zonal) for the cluster"
-  type        = string
-}
+variable "clusters" {
+  description = "Map of GKE clusters to create (key = cluster name)"
+  type = map(object({
+    location    = string
+    description = optional(string)
 
-variable "description" {
-  description = "Description of the cluster"
-  type        = string
-  default     = null
-}
+    network    = string
+    subnetwork = string
 
-variable "network_self_link" {
-  description = "Self-link of the VPC network"
-  type        = string
-}
+    ip_allocation_policy = optional(object({
+      cluster_secondary_range_name  = string
+      services_secondary_range_name = string
+    }), null)
 
-variable "subnetwork_self_link" {
-  description = "Self-link of the subnetwork for nodes"
-  type        = string
-}
+    release_channel = optional(string, "REGULAR")
 
-variable "cluster_secondary_range_name" {
-  description = "Secondary range name for Pods"
-  type        = string
-}
+    private_cluster_config = optional(object({
+      enable_private_nodes    = optional(bool, true)
+      enable_private_endpoint = optional(bool, true)
+      master_ipv4_cidr_block  = optional(string) # Made optional; required only when private endpoint enabled
+    }), null)
 
-variable "services_secondary_range_name" {
-  description = "Secondary range name for Services"
-  type        = string
-}
+    master_authorized_networks_config = optional(object({
+      enabled = optional(bool, false)
+      cidr_blocks = optional(list(object({
+        display_name = string
+        cidr_block   = string
+      })), [])
+    }), null)
 
-variable "release_channel" {
-  description = "Release channel (e.g., REGULAR, STABLE)"
-  type        = string
-  default     = null
-}
+    workload_identity_config = optional(object({
+      workload_pool = optional(string) # Made optional; default provided in root module
+    }), null)
 
-variable "private_cluster_config" {
-  description = "Private cluster configuration"
-  type = object({
-    enable_private_nodes    = bool
-    enable_private_endpoint = bool
-    master_ipv4_cidr_block  = string
-  })
-  default = null
-}
+    logging_config = optional(object({
+      enable_system_components   = optional(bool, true)
+      enable_workload_components = optional(bool, false)
+      }), {
+      enable_system_components   = true
+      enable_workload_components = false
+    })
 
-variable "master_authorized_networks" {
-  description = "List of master authorized CIDR blocks"
-  type = list(object({
-    display_name = optional(string)
-    cidr_block   = string
+    monitoring_config = optional(object({
+      enable_system_components  = optional(bool, true)
+      enable_managed_prometheus = optional(bool, false)
+      }), {
+      enable_system_components  = true
+      enable_managed_prometheus = false
+    })
+
+    cost_management_config = optional(object({
+      enabled = optional(bool, false)
+    }), { enabled = false })
+
+    addons_config = optional(object({
+      http_load_balancing   = optional(object({ disabled = optional(bool, false) }), {})
+      network_policy_config = optional(object({ disabled = optional(bool, false) }), {})
+    }), {})
+
+    maintenance_policy = optional(object({
+      daily_maintenance_window = optional(object({
+        start_time = optional(string, "03:00") # Made optional with sensible default
+      }), null)
+    }), null)
+
+    enable_autopilot = optional(bool, false)
+
+    node_pools = optional(map(object({
+      initial_node_count = optional(number)
+      node_config = object({
+        machine_type    = string
+        disk_size_gb    = optional(number, 100)
+        service_account = string
+        oauth_scopes    = optional(list(string), ["https://www.googleapis.com/auth/cloud-platform"])
+        shielded_instance_config = optional(object({
+          enable_secure_boot          = optional(bool, true)
+          enable_integrity_monitoring = optional(bool, true)
+        }), {})
+        labels = optional(map(string), {})
+        taints = optional(list(object({
+          key    = string
+          value  = string
+          effect = string
+        })), [])
+      })
+      management = optional(object({
+        auto_repair  = optional(bool, true)
+        auto_upgrade = optional(bool, true)
+      }), {})
+      autoscaling = optional(object({
+        min_node_count = number
+        max_node_count = number
+      }), null)
+    })), {})
   }))
-  default = []
-}
-
-variable "workload_pool" {
-  description = "Workload Identity pool (project_id.svc.id.goog)"
-  type        = string
-  default     = null
-}
-
-variable "database_encryption" {
-  description = "Database encryption config"
-  type = object({
-    state    = string  # ENCRYPTED or DECRYPTED
-    key_name = string
-  })
-  default = null
-}
-
-variable "logging_components" {
-  description = "List of logging components to enable (SYSTEM_COMPONENTS, WORKLOADS)"
-  type        = list(string)
-  default     = ["SYSTEM_COMPONENTS"]
-}
-
-variable "monitoring_components" {
-  description = "List of monitoring components to enable (SYSTEM_COMPONENTS, WORKLOADS, etc.)"
-  type        = list(string)
-  default     = ["SYSTEM_COMPONENTS"]
-}
-
-variable "managed_prometheus_enabled" {
-  description = "Enable Managed Prometheus"
-  type        = bool
-  default     = false
-}
-
-variable "cost_allocation_enabled" {
-  description = "Enable GKE cost allocation (enable_cost_management)"
-  type        = bool
-  default     = false
-}
-
-variable "addons" {
-  description = "Addons configuration"
-  type = object({
-    http_load_balancing_disabled = optional(bool, false)
-    network_policy_disabled      = optional(bool, false)
-  })
   default = {}
 }
 
-variable "maintenance_window_start" {
-  description = "Daily maintenance window start time (e.g., 03:00)"
-  type        = string
-  default     = null
-}
-
-variable "enable_autopilot" {
-  description = "Enable GKE Autopilot mode"
-  type        = bool
-  default     = false
+variable "labels" {
+  description = "Optional global labels"
+  type        = map(string)
+  default     = {}
 }

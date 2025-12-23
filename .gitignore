@@ -2,4 +2,4 @@
 # terraform.tfstate*
 # draft/
 # vpc, nat, fw, iam roles, vm
-# gke, lb, mig, cr
+# gke, lb, mig, cr, waf, cdn
