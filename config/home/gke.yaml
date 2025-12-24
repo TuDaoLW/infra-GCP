@@ -2,29 +2,56 @@
 gke_clusters:
   cluster-sea1:
     project_id: stone-booking-482114-v1
-    location: asia-southeast1-a # <<< ZONAL for testing (1 node only)
-    description: "Test simple GKE cluster"
+    location: asia-southeast1-a
+    description: "Primary GKE cluster"
+
     network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
     subnetwork: "projects/stone-booking-482114-v1/regions/asia-southeast1/subnetworks/gke-primary"
+
     master_authorized_networks_config:
       cidr_blocks:
         - display_name: "management-subnet"
           cidr_block: "10.0.0.0/24"
+
     ip_allocation_policy:
       cluster_secondary_range_name: gke-pods
       services_secondary_range_name: gke-services
 
     release_channel: REGULAR
     deletion_protection: false
+
     private_cluster_config:
       enable_private_nodes: true
       enable_private_endpoint: true
       master_ipv4_cidr_block: "172.16.0.32/28"
 
+    # Toggle this to true for production (remove default pool)
+    remove_default_node_pool: true
+
+    # Default node pool settings (used if remove_default_node_pool = false)
+    initial_node_count: 1
+    machine_type: e2-medium
+    disk_size_gb: 39
+    spot: true
     service_account: "gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
 
-    disk_size_gb: 36
-    machine_type: e2-medium
-    spot: true
-
-    initial_node_count: 2
+    # Custom node pools (used when remove_default_node_pool = true)
+    node_pools:
+      general-spot:
+        initial_node_count: 1
+        autoscaling:
+          min_node_count: 1
+          max_node_count: 3
+        management:
+          auto_repair: true
+          auto_upgrade: true
+        machine_type: e2-medium
+        disk_size_gb: 37
+        spot: true
+        service_account: "gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
+        labels:
+          workload-type: "general"
+        # taints:
+        #   - key: "app"
+        #     value: "critical"
+        #     effect: "NO_SCHEDULE"

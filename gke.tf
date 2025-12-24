@@ -15,14 +15,27 @@ module "gke_clusters" {
 
   private_cluster_config = each.value.private_cluster_config
 
-  service_account = each.value.service_account
+  master_authorized_networks_config = try(each.value.master_authorized_networks_config, { cidr_blocks = [] })
 
-  disk_size_gb        = try(each.value.disk_size_gb, 37)
-  machine_type        = try(each.value.machine_type, "e2-medium")
-  spot                = try(each.value.spot, false)
-  deletion_protection = try(each.value.deletion_protection, false)
-  initial_node_count  = try(each.value.initial_node_count, 1)
+  release_channel      = try(each.value.release_channel, "REGULAR")
+  deletion_protection  = try(each.value.deletion_protection, false)
 
-  release_channel = try(each.value.release_channel, "REGULAR")
-  depends_on      = [module.vpcs]
+  # Default node pool settings
+  remove_default_node_pool      = try(each.value.remove_default_node_pool, false)
+  initial_node_count            = try(each.value.initial_node_count, 1)
+  default_machine_type          = try(each.value.machine_type, "e2-medium")
+  default_disk_size_gb          = try(each.value.disk_size_gb, 37)
+  default_disk_type             = try(each.value.disk_type, "pd-balanced")
+  default_service_account       = each.value.service_account
+  default_oauth_scopes          = try(each.value.oauth_scopes, ["https://www.googleapis.com/auth/cloud-platform"])
+  default_spot                  = try(each.value.spot, false)
+  default_labels                = try(each.value.labels, {})
+  default_taints                = try(each.value.taints, [])
+  default_shielded_secure_boot  = try(each.value.shielded_secure_boot, true)
+  default_shielded_integrity_monitoring = try(each.value.shielded_integrity_monitoring, true)
+
+  # Custom node pools
+  node_pools = try(each.value.node_pools, {})
+
+  depends_on = [module.vpcs]
 }
