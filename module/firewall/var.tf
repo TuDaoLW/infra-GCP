@@ -8,12 +8,6 @@ variable "network_self_link" {
   type        = string
 }
 
-# variable "global_labels" {
-#   description = "Global labels to apply to all firewall rules"
-#   type        = map(string)
-#   default     = {}
-# }
-
 variable "rules" {
   description = "Map of firewall rule configurations (key = rule name)"
   type = map(object({

@@ -27,7 +27,7 @@ variable "master_authorized_networks_config" {
   })
   default = { cidr_blocks = [] }
 }
-variable "release_channel" { type = string}
+variable "release_channel" { type = string }
 variable "deletion_protection" { type = bool }
 
 # New: Toggle for default node pool
@@ -38,21 +38,21 @@ variable "remove_default_node_pool" {
 }
 
 # For default node pool (when remove_default_node_pool = false)
-variable "initial_node_count" { type = number}
+variable "initial_node_count" { type = number }
 variable "default_machine_type" { type = string }
-variable "default_disk_size_gb" { 
-  type = number
-default = 37 
+variable "default_disk_size_gb" {
+  type    = number
+  default = 37
 }
-variable "default_disk_type" { 
-  type = string
-  default = "pd-balanced" 
-  }
+variable "default_disk_type" {
+  type    = string
+  default = "pd-balanced"
+}
 variable "default_service_account" { type = string }
-variable "default_oauth_scopes" { 
-  type = list(string)
-  default = ["https://www.googleapis.com/auth/cloud-platform"] 
-  }
+variable "default_oauth_scopes" {
+  type    = list(string)
+  default = ["https://www.googleapis.com/auth/cloud-platform"]
+}
 variable "default_spot" { type = bool }
 variable "default_labels" { type = map(string) }
 variable "default_taints" {
@@ -92,4 +92,34 @@ variable "node_pools" {
     shielded_integrity_monitoring = optional(bool, true)
   }))
   default = {}
+}
+
+variable "default_autoscaling_enabled" {
+  description = "Enable cluster autoscaler on default node pool"
+  type        = bool
+  default     = false
+}
+
+variable "default_autoscaling_min_cpu" {
+  description = "Minimum CPU cores for default node pool autoscaling"
+  type        = number
+  default     = 1
+}
+
+variable "default_autoscaling_max_cpu" {
+  description = "Maximum CPU cores for default node pool autoscaling"
+  type        = number
+  default     = 20
+}
+
+variable "default_autoscaling_min_memory" {
+  description = "Minimum memory (GB) for default node pool autoscaling"
+  type        = number
+  default     = 4
+}
+
+variable "default_autoscaling_max_memory" {
+  description = "Maximum memory (GB) for default node pool autoscaling"
+  type        = number
+  default     = 100
 }

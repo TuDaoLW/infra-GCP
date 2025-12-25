@@ -1,22 +1,22 @@
 ---
-vpc_networks:
+vpc_networks: #{} #none
   sample-vpc:
     project_id: stone-booking-482114-v1
-    auto_create_subnetworks: false # custom subnets
-    routing_mode: REGIONAL # Or GLOBAL
+    auto_create_subnetworks: false 
+    routing_mode: REGIONAL
     mtu: 1460
     description: "VPC network for core services and applications"
     tags:
-      - "costcenter-main" # Example tag
+      - "costcenter-main" 
 
     subnets:
       - name: management
         region: asia-southeast1
         ip_cidr_range: 10.0.0.0/24
-        private_ip_google_access: true # Enable Private Google Access
+        private_ip_google_access: true
         description: "Subnet for management VMs and tools"
         tags:
-          - "management-access" # tag for firewall rules
+          - "management-access" 
 
       - name: databases
         region: asia-southeast1
@@ -58,8 +58,8 @@ vpc_networks:
       - name: loadbalancer-proxy
         region: asia-southeast1
         ip_cidr_range: 10.129.0.0/23
-        purpose: REGIONAL_MANAGED_PROXY # This is correct for internal HTTP(S) Load Balancers
-        role: ACTIVE # Indicates this is an active proxy subnet
+        purpose: REGIONAL_MANAGED_PROXY
+        role: ACTIVE
         private_ip_google_access: false
         description: "Dedicated proxy-only subnet for internal HTTP(S) Load Balancers"
         tags:

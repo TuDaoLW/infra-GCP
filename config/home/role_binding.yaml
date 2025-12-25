@@ -1,43 +1,40 @@
 ---
 iam_role_bindings:
-  # management-vm-operator-binding: # Unique identifier
-  #   role: "projects/stone-booking-482114-v1/roles/managementVmOperator"
-  #   members:
-  #     - "serviceAccount:management-vm-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
-  #   resource_id: "stone-booking-482114-v1" # The specific resource this binding applies to
-  #   resource_type: "project" # The type of resource (e.g., "project", "bucket")
-  #   description: "Binds the custom Management VM Operator role to the management service account at the project level."
-  #   condition: # Optional: Example (e.g., time-based access), Conditions can't be set on primitive roles.
-  #     title: "temporary-access"
-  #     expression: 'request.time < timestamp("2024-12-31T23:59:59Z")'
-  #     description: "Temporary access for management VM during migration phase."
+  management-vm-operator-binding: # Unique identifier
+    role: "projects/stone-booking-482114-v1/roles/managementVmOperator"
+    members:
+      - "serviceAccount:management-vm-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
+    resource_id: "stone-booking-482114-v1" # The specific resource this binding applies to
+    resource_type: "project" # The type of resource (e.g., "project", "bucket")
+    description: "Binds the custom Management VM Operator role to the management service account at the project level."
+    condition: # Optional: Example (e.g., time-based access), Conditions can't be set on primitive roles.
+      title: "temporary-access"
+      expression: 'request.time < timestamp("2025-12-31T23:59:59Z")'
+      description: "Temporary access for management VM during migration phase."
 
-  # Binding for GKE Application Service Account to Read Storage (for pod)
-  # my-app-gsa-storage-reader-binding:
-  #   role: "roles/storage.objectViewer" # Predefined role
-  #   members:
-  #     - "serviceAccount:my-app-gsa@stone-booking-482114-v1.iam.gserviceaccount.com"
-  #   resource_id: "stone-booking-482114-v1"
-  #   resource_type: "project"
-  #   description: "Grants GSA 'my-app-gsa' object viewer access to all buckets in the project."
-  #   # Production Recommendation: Consider binding this at the specific bucket level for more security:
-  #   # resource_id: "my-app-bucket-name"
-  #   # resource_type: "bucket"
+  management-vm-gke-developer-binding:
+      role: "roles/container.developer"
+      members:
+        - "serviceAccount:management-vm-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
+      resource_id: "stone-booking-482114-v1"
+      resource_type: "project"
+      description: "Grants full control over Kubernetes workloads (Pods, Services, Deployments) but not cluster administration."
+      condition:
+        title: "temporary-access"
+        expression: 'request.time < timestamp("2025-12-31T23:59:59Z")'
+        description: "Temporary access matching the custom role."
 
-  # Binding for Workload Identity: Allow KSA to Impersonate GSA for My App
   workload-identity-my-app-binding:
-    # This role binding is applied ON the Google Service Account itself (my-app-gsa),
     role: "roles/iam.workloadIdentityUser" # Special IAM role for Workload Identity
     members:
-      # Format: 'serviceAccount:PROJECT_ID.svc.id.goog[NAMESPACE/KSA_NAME]'
       - "serviceAccount:stone-booking-482114-v1.svc.id.goog[default/my-app-ksa]"
-    resource_id: "my-app-gsa@stone-booking-482114-v1.iam.gserviceaccount.com" # The GSA being impersonated
-    resource_type: "serviceAccount" # Google Service Account
+    resource_id: "my-app-gsa@stone-booking-482114-v1.iam.gserviceaccount.com" 
+    resource_type: "serviceAccount"
     description: "Enables Kubernetes Service Account 'default/my-app-ksa' to impersonate 'my-app-gsa' via Workload Identity."
 
   # GKE Node Pool Access (if not using Autopilot)
   gke-node-pool-access-binding:
-    role: "roles/container.nodeServiceAccount" # Predefined GKE node service account role
+    role: "roles/container.nodeServiceAccount"
     members:
       - "serviceAccount:gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
     resource_id: "stone-booking-482114-v1"
@@ -67,35 +64,3 @@ iam_role_bindings:
     resource_id: "stone-booking-482114-v1"
     resource_type: "project"
     description: "Required minimum role for GKE node service account."
-    
-  # Bind predefined role to Cloud Run service account
-  # cloud-run-viewer-binding:
-  #   role: "roles/run.viewer" # Example: Read-only access to Cloud Run services metadata
-  #   members:
-  #     - "serviceAccount:cloud-run-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
-  #   resource_id: "stone-booking-482114-v1"
-  #   resource_type: "project"
-  #   description: "Grants Cloud Run service account 'cloud-run-sa' read access to Cloud Run service configurations."
-
-  # Example: If Cloud Run needs to write to a database or GCS, bind specific roles here.
-  # cloud-run-storage-creator-binding:
-  #   role: "roles/storage.objectCreator"
-  #   members:
-  #     - "serviceAccount:cloud-run-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
-  #   resource_id: "my-cloud-run-data-bucket" # Bind at the bucket level for granular access
-  #   resource_type: "bucket"
-  #   description: "Allows Cloud Run service to create objects in a specific storage bucket."
-
-  # Example: Granting a predefined role to a human user or group
-  # admin-team-editor-binding:
-  #   role: "roles/editor" # A broader role, use with caution and only for trusted admin users/groups
-  #   members:
-  #     - "user:admin-user@example.com"
-  #     - "group:gcp-admins@example.com"
-  #   resource_id: "stone-booking-482114-v1"
-  #   resource_type: "project"
-  #   description: "Grants editor permissions to admin users and groups for the project."
-  #   condition: # Example of a condition for human users
-  #     title: "access-from-trusted-network"
-  #     expression: "request.matchIP('203.0.113.0/24')" # Only allow if source IP is from trusted range
-  #     description: "Editor access only from the corporate network."

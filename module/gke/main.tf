@@ -37,6 +37,41 @@ resource "google_container_cluster" "cluster" {
     }
   }
 
+  # Cluster-level autoscaling / NAP control
+  dynamic "cluster_autoscaling" {
+    for_each = var.default_autoscaling_enabled || var.remove_default_node_pool ? [1] : []
+    content {
+      enabled = var.default_autoscaling_enabled
+
+      # Only include resource limits if enabled
+      dynamic "resource_limits" {
+        for_each = var.default_autoscaling_enabled ? [1] : []
+        content {
+          resource_type = "cpu"
+          minimum       = var.default_autoscaling_min_cpu
+          maximum       = var.default_autoscaling_max_cpu
+        }
+      }
+      dynamic "resource_limits" {
+        for_each = var.default_autoscaling_enabled ? [1] : []
+        content {
+          resource_type = "memory"
+          minimum       = var.default_autoscaling_min_memory
+          maximum       = var.default_autoscaling_max_memory
+        }
+      }
+
+      # Optional defaults for NAP-created nodes (only used if enabled)
+      dynamic "auto_provisioning_defaults" {
+        for_each = var.default_autoscaling_enabled ? [1] : []
+        content {
+          service_account = var.default_service_account
+          oauth_scopes    = var.default_oauth_scopes
+        }
+      }
+    }
+  }
+
   network    = var.network
   subnetwork = var.subnetwork
 
@@ -78,10 +113,10 @@ resource "google_container_cluster" "cluster" {
 resource "google_container_node_pool" "pools" {
   for_each = var.remove_default_node_pool ? var.node_pools : {}
 
-  name       = each.key
-  location   = var.location
-  cluster    = google_container_cluster.cluster.name
-  project    = var.project_id
+  name     = each.key
+  location = var.location
+  cluster  = google_container_cluster.cluster.name
+  project  = var.project_id
 
   initial_node_count = try(each.value.initial_node_count, 1)
 

@@ -1,6 +1,5 @@
 ---
-# Cloud Router Configuration
-cloud_routers:
+cloud_routers: #{} #none
   asia-southeast1-nat-router:
     project_id: stone-booking-482114-v1
     vpc_name: "sample-vpc"
@@ -8,20 +7,19 @@ cloud_routers:
     network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
     description: "Cloud Router for Cloud NAT gateway in asia-southeast1."
 
-# --- Cloud NAT Gateway Configuration ---
-cloud_nat_gateways:
+cloud_nat_gateways: #{} #none
   asia-southeast1-public-nat:
     project_id: stone-booking-482114-v1
     vpc_name: "sample-vpc"
     region: asia-southeast1
-    router_name: "asia-southeast1-nat-router" # Reference to the Cloud Router defined above
+    router_name: "asia-southeast1-nat-router"
     network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
-    nat_ip_allocation_mode: "AUTO_ONLY" # AUTO_ONLY for dynamic IP allocation (recommended)
-    # Alternatively, for static IPs, you'd specify a list of pre-reserved IP addresses:
+    nat_ip_allocation_mode: "AUTO_ONLY" # AUTO_ONLY for dynamic IP allocation
+    # For static IPs, list of pre-reserved IP addresses:
     # nat_ips:
     #   - "projects/stone-booking-482114-v1/regions/asia-southeast1/addresses/nat-ip-01"
     #   - "projects/stone-booking-482114-v1/regions/asia-southeast1/addresses/nat-ip-02"
-    source_subnetwork_ip_ranges_to_nat: "LIST_OF_SUBNETWORKS" # Or "ALL_SUBNETWORKS_ALL_IP_RANGES" for simplicity
+    source_subnetwork_ip_ranges_to_nat: "LIST_OF_SUBNETWORKS" # Or "ALL_SUBNETWORKS_ALL_IP_RANGES"
     # LIST_OF_SUBNETWORKS is highly recommended for granular control.
     subnetworks:
       - name: "management"

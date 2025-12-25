@@ -1,27 +1,12 @@
 ---
-firewall_rules:
-  # Management rules
-  # - name: allow-ssh-from-admin-ips # use IAP
-  #   network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
-  #   direction: INGRESS
-  #   priority: 100
-  #   action: ALLOW
-  #   source_ranges:
-  #     - "YOUR_ADMIN_IP_RANGE_1"
-  #     - "YOUR_ADMIN_IP_RANGE_2"
-  #   target_tags: ["ssh-allowed"] # Applies to VMs tagged 'ssh-allowed'
-  #   protocols:
-  #     - protocol: tcp
-  #       ports: ["22"]
-  #   description: "Allows SSH from specified trusted admin IP ranges to VMs with 'ssh-allowed' tag."
-  
+firewall_rules: #{} #none
   allow-master-to-nodes:
     network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
     direction: INGRESS
-    priority: 100  # Higher than denies
+    priority: 100 
     action: ALLOW
-    source_ranges: ["172.16.0.32/28"]  # Your master_ipv4_cidr_block
-    target_ranges: ["10.0..0/8"]
+    source_ranges: ["172.16.0.32/28"] 
+    target_ranges: ["10.0.0.0/8"] 
     protocols:
       - protocol: tcp
         ports: ["443", "10250"]
@@ -30,66 +15,58 @@ firewall_rules:
   allow-node-to-master:
     network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
     direction: INGRESS
-    priority: 100  # Higher than denies
+    priority: 100 
     action: ALLOW
-    source_ranges: ["10.0.0.0/8"]  # Your master_ipv4_cidr_block 
+    source_ranges: ["10.0.0.0/8"] 
     target_ranges: ["172.16.0.32/28"]
     protocols:
       - protocol: tcp
         ports: ["443", "10250"]
     description: "Allows GKE control plane to communicate with nodes (required for private clusters)."
 
-  allow-iap-ssh: # Access to VMs with no public IP via IAP, like AWS SSM
+  allow-iap-ssh:
     network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
     direction: INGRESS
     priority: 110
     action: ALLOW
-    source_ranges: ["35.235.240.0/20"] # Google's IP range for IAP TCP Forwarding
+    source_ranges: ["35.235.240.0/20"]
     # target_tags: ["iap-ssh", "goog-gke-node"]
-    target_ranges: ["10.0..0/8"]
+    target_ranges: ["10.0.0.0/8"]
     protocols:
       - protocol: tcp
         ports: ["22"]
     description: "Allows SSH access to VMs tagged 'iap-ssh' via Google Cloud IAP (Identity-Aware Proxy)."
 
-  # Application-Specific Ingress Rules
-  allow-gke-to-databases:
-    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
-    direction: INGRESS
-    priority: 200
-    action: ALLOW
-    # Production Best Practice: Use specific subnets for source/target if possible,
-    # or leverage service accounts if only specific service accounts should initiate traffic.
-    # If source_service_accounts is desired, use it like this:
-    # source_service_accounts: ["gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"]
-    source_ranges:
-      - "10.0.2.0/23" # GKE Node IPs
-      - "10.1.0.0/20" # GKE Pod IPs
-      - "10.2.0.0/20" # GKE Services IPs
-    target_ranges:
-      - "10.0.1.0/24" # Database subnet CIDR
-    protocols:
-      - protocol: tcp
-        ports: ["5432", "3306", "1433", "6379"] # PostgreSQL, MySQL, SQL Server, Redis
-    description: "Allows traffic from GKE nodes/pods to the database subnet on specified database ports."
-
   # internal VPC communication
+  # allow-internal-all-subnets:
+  #   network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+  #   direction: INGRESS
+  #   priority: 300
+  #   action: ALLOW
+  #   source_ranges:
+  #     - "10.0.0.0/8"
+  #   target_ranges:
+  #     - "10.0.0.0/8"
+  #   protocols:
+  #     - protocol: tcp
+  #       ports: ["0-65535"]
+  #     - protocol: udp
+  #       ports: ["0-65535"]
+  #     - protocol: icmp
+  #   description: "Allows all TCP/UDP/ICMP communication between internal subnets within the 'sample-vpc'."
+
   allow-internal-all-subnets:
     network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
     direction: INGRESS
     priority: 300
     action: ALLOW
     source_ranges:
-      - "10.0.0.0/8"
-    target_ranges:
-      - "10.0.0.0/8"
+      - "10.0.0.0/8"         
+      - "172.16.0.0/12"      
+      - "192.168.0.0/16"   
     protocols:
-      - protocol: tcp
-        ports: ["0-65535"]
-      - protocol: udp
-        ports: ["0-65535"]
-      - protocol: icmp
-    description: "Allows all TCP/UDP/ICMP communication between internal subnets within the 'sample-vpc'."
+      - protocol: all       
+    description: "Allows full internal communication including to GKE private control plane."
 
   # Load Balancer Health Check Rules (Required for Load Balancers)
   allow-lb-health-checks: # Allows Google Cloud Load Balancer health probes
@@ -135,37 +112,6 @@ firewall_rules:
         ports: ["53"] # DNS
       - protocol: icmp # Ping and other ICMP uses
     description: "Allows specified instances to make outbound connections to the internet on common ports."
-
-  # ------------------------------------------------------------------------
-  # Catch-All Deny Rules (Critical for Security)
-  # These ensure that anything not explicitly allowed is denied.
-  # ------------------------------------------------------------------------
-
-  # deny-all-other-ingress: # Explicitly deny all other inbound traffic
-  #   network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
-  #   direction: INGRESS
-  #   priority: 65534 # High number to ensure it's evaluated last for ingress
-  #   action: DENY
-  #   source_ranges: ["0.0.0.0/0"] # From anywhere
-  #   destination_ranges: ["0.0.0.0/0"] # To anywhere (within the network)
-  #   protocols:
-  #     - protocol: all # Deny all protocols
-  #   description: "Explicitly denies all inbound traffic not explicitly allowed by higher priority rules. Critical for 'deny by default' security."
-
-  # deny-all-other-egress: # Explicitly deny all other outbound traffic
-  #   network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
-  #   direction: EGRESS
-  #   priority: 65534 # Same high number to ensure it's evaluated last for egress
-  #   action: DENY
-  #   source_ranges: ["0.0.0.0/0"] # From anywhere (within the network)
-  #   destination_ranges: ["0.0.0.0/0"] # To anywhere
-  #   protocols:
-  #     - protocol: all # Deny all protocols
-  #   description: "Explicitly denies all outbound traffic not explicitly allowed by higher priority rules. Critical for 'deny by default' security."
-
-  # ------------------------------------------------------------------------
-  # Essential GCP Default-like Rules (often implicitly created or best to define)
-  # ------------------------------------------------------------------------
 
   allow-internal-icmp: # Allow ICMP for internal network diagnostics
     network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"

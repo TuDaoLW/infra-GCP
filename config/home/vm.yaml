@@ -15,34 +15,42 @@ compute_instances:
           size_gb: 24
           type: pd-balanced
 
-      - device_name: data-disk-01
-        boot: false
-        auto_delete: false
-        initialize_params:
-          size_gb: 20
-          type: pd-balanced
+      # - device_name: data-disk-01
+      #   boot: false
+      #   auto_delete: false
+      #   initialize_params:
+      #     size_gb: 20
+      #     type: pd-balanced
 
     network_interfaces: # Standardized to snake_case
       - subnetwork: "projects/stone-booking-482114-v1/regions/asia-southeast1/subnetworks/management" # Full subnetwork selfLink recommended
         # Private IP Configuration:
         network_ip: "10.0.0.10"
 
-        # Public IP Configuration:
-        # access_configs:
-        #   - type: ONE_TO_ONE_NAT
-        # For an ephemeral public IP, omit nat_ip.
-        # nat_ip: "projects/stone-booking-482114-v1/regions/asia-southeast1/addresses/my-static-external-ip"
-
     metadata:
       enable-oslogin: "TRUE" # string
       startup-script: |
         #!/bin/bash
-        echo "Running startup script for management-vm-01..."
-        # Add your startup commands here, e.g., install software, configure services
-        sudo apt-get update
-        sudo apt-get install -y nginx
-        echo "Hello from management-vm-01!" | sudo tee /var/www/html/index.html
-        echo "Startup script finished."
+        sudo apt-get install apt-transport-https ca-certificates gnupg curl -y
+        curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+        echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+        rm kubectl
+
+        sudo apt-get update && sudo apt-get install google-cloud-sdk-gke-gcloud-auth-plugin -y
+        cat <<EOF | sudo tee /etc/profile.d/kubectl_settings.sh
+        source <(kubectl completion bash)
+        alias k=kubectl
+        complete -o default -F __start_kubectl k
+        export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+        EOF
+        sudo chmod +x /etc/profile.d/kubectl_settings.sh
+
+        # sudo apt-get update
+        # sudo apt-get install -y nginx
+        # echo "Hello from management-vm-01!" | sudo tee /var/www/html/index.html
       shutdown-script: |
         #!/bin/bash
         echo "Running shutdown script for management-vm-01..."
@@ -67,6 +75,3 @@ compute_instances:
       enable_secure_boot: true
       enable_vtpm: true
       enable_integrity_monitoring: true
-    # guest_accelerator: # Example: For GPU-attached VMs
-    #   - type: "nvidia-tesla-v100"
-    #     count: 1
