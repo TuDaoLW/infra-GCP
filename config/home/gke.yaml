@@ -1,69 +1,69 @@
 ---
-gke_clusters:
-  cluster-sea1:
-    project_id: stone-booking-482114-v1
-    location: asia-southeast1-a
-    description: "Primary GKE cluster"
+# gke_clusters:
+#   cluster-sea1:
+#     project_id: stone-booking-482114-v1
+#     location: asia-southeast1-a
+#     description: "Primary GKE cluster"
 
-    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
-    subnetwork: "projects/stone-booking-482114-v1/regions/asia-southeast1/subnetworks/gke-primary"
+#     network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+#     subnetwork: "projects/stone-booking-482114-v1/regions/asia-southeast1/subnetworks/gke-primary"
 
-    master_authorized_networks_config:
-      cidr_blocks:
-        - display_name: "management-subnet"
-          cidr_block: "10.0.0.0/24"
-        # - display_name: "cloud-shell-access"
-        #   cidr_block: "35.191.0.0/16"
-        # - display_name: "cloud-shell-access-2"
-        #   cidr_block: "130.211.0.0/22"
+#     master_authorized_networks_config:
+#       cidr_blocks:
+#         - display_name: "management-subnet"
+#           cidr_block: "10.0.0.0/24"
+#         # - display_name: "cloud-shell-access"
+#         #   cidr_block: "35.191.0.0/16"
+#         # - display_name: "cloud-shell-access-2"
+#         #   cidr_block: "130.211.0.0/22"
 
-    ip_allocation_policy:
-      cluster_secondary_range_name: gke-pods
-      services_secondary_range_name: gke-services
+#     ip_allocation_policy:
+#       cluster_secondary_range_name: gke-pods
+#       services_secondary_range_name: gke-services
 
-    release_channel: REGULAR
-    deletion_protection: false
+#     release_channel: REGULAR
+#     deletion_protection: false
 
-    private_cluster_config:
-      enable_private_nodes: true
-      enable_private_endpoint: true
-      master_ipv4_cidr_block: "172.16.0.32/28"
+#     private_cluster_config:
+#       enable_private_nodes: true
+#       enable_private_endpoint: true
+#       master_ipv4_cidr_block: "172.16.0.32/28"
 
-    # Toggle this to true for production (remove default pool)
-    remove_default_node_pool: true
+#     # Toggle this to true for production (remove default pool)
+#     remove_default_node_pool: true
 
-    initial_node_count: 1
-    machine_type: e2-medium
-    disk_size_gb: 36
-    spot: true
-    service_account: "gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
+#     initial_node_count: 1
+#     machine_type: e2-medium
+#     disk_size_gb: 36
+#     spot: true
+#     service_account: "gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
 
-    # default scale, nap, should not use, cant control node size
-    default_autoscaling_enabled: false
-    # default_autoscaling_min_cpu: 1
-    # default_autoscaling_max_cpu: 8
-    # default_autoscaling_min_memory: 1
-    # default_autoscaling_max_memory: 16
-    # Locations: Restrict to specific zones.
-    # Disk: Set default disk size and type.
+#     # default scale, nap, should not use, cant control node size
+#     default_autoscaling_enabled: false
+#     # default_autoscaling_min_cpu: 1
+#     # default_autoscaling_max_cpu: 8
+#     # default_autoscaling_min_memory: 1
+#     # default_autoscaling_max_memory: 16
+#     # Locations: Restrict to specific zones.
+#     # Disk: Set default disk size and type.
 
-    # Custom node pools (used when remove_default_node_pool = true)
-    node_pools:
-      general-spot:
-        initial_node_count: 2
-        autoscaling:
-          min_node_count: 1
-          max_node_count: 3
-        management:
-          auto_repair: true
-          auto_upgrade: true
-        machine_type: e2-medium
-        disk_size_gb: 48
-        spot: true
-        service_account: "gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
-        labels:
-          workload-type: "general"
-        # taints:
-        #   - key: "app"
-        #     value: "critical"
-        #     effect: "NO_SCHEDULE"
+#     # Custom node pools (used when remove_default_node_pool = true)
+#     node_pools:
+#       general-spot:
+#         initial_node_count: 2
+#         autoscaling:
+#           min_node_count: 1
+#           max_node_count: 3
+#         management:
+#           auto_repair: true
+#           auto_upgrade: true
+#         machine_type: e2-medium
+#         disk_size_gb: 48
+#         spot: true
+#         service_account: "gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
+#         labels:
+#           workload-type: "general"
+#         # taints:
+#         #   - key: "app"
+#         #     value: "critical"
+#         #     effect: "NO_SCHEDULE"
