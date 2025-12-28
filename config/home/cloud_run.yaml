@@ -1,0 +1,79 @@
+---
+cloud_run_services:
+  api-service-01:
+    project_id: stone-booking-482114-v1
+    location: asia-southeast1
+    description: "TypeScript API backend"
+    ingress: "INGRESS_TRAFFIC_ALL"
+    deletion_protection: false
+
+    image: "nginx:latest"
+
+    container:
+      port: 8080
+      concurrency: 80
+      cpu: "1"
+      memory: "512Mi"
+      startup_probe:
+        http_get:
+          path: "/healthz"
+
+    scaling:
+      min_instances: 0
+      max_instances: 100
+
+    vpc_access:
+    #   connector: "projects/stone-booking-482114-v1/regions/asia-southeast1/connectors/serverless-connector"
+    #   egress: "ALL_TRAFFIC"
+
+    env_vars:
+      - name: NODE_ENV
+        value: production
+
+    secret_env_vars:
+      - name: DATABASE_PASSWORD
+        secret: db-password-secret
+        version: latest
+
+    allow_unauthenticated: true
+
+    extra_labels:
+      application: "booking-platform"
+      environment: "production"
+
+  # frontend-service-01:
+  #   project_id: stone-booking-482114-v1
+  #   location: asia-southeast1
+  #   description: "TypeScript frontend service (serving static + API proxy if needed)"
+  #   ingress: "INGRESS_TRAFFIC_ALL"
+  #   deletion_protection: false
+  #   image: "us-docker.pkg.dev/stone-booking-482114-v1/my-repo/frontend-placeholder:latest"
+
+  #   container:
+  #     port: 3000
+  #     concurrency: 100
+  #     cpu: "1"
+  #     memory: "256Mi"
+
+  #   scaling:
+  #     min_instances: 0
+  #     max_instances: 50
+
+  #   vpc_access: # Optional – only if it needs private Cloud SQL/Firebase access
+  #     connector: "projects/stone-booking-482114-v1/regions/asia-southeast1/connectors/serverless-connector"
+  #     egress: "ALL_TRAFFIC"
+
+  #   env_vars:
+  #     - name: NODE_ENV
+  #       value: production
+
+  #   allow_unauthenticated: true
+
+  #   tags:
+  #     - "frontend"
+  #     - "typescript"
+
+  #   extra_labels:
+  #     application: "booking-platform"
+  #     environment: "production"
+  #     team: "frontend"

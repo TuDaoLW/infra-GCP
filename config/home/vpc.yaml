@@ -6,8 +6,6 @@ vpc_networks: #{} #none
     routing_mode: REGIONAL
     mtu: 1460
     description: "VPC network for core services and applications"
-    tags:
-      - "costcenter-main" 
 
     subnets:
       - name: management
@@ -15,16 +13,12 @@ vpc_networks: #{} #none
         ip_cidr_range: 10.0.0.0/24
         private_ip_google_access: true
         description: "Subnet for management VMs and tools"
-        tags:
-          - "management-access" 
 
       - name: databases
         region: asia-southeast1
         ip_cidr_range: 10.0.1.0/24
         private_ip_google_access: true
         description: "Subnet for database instances (e.g., Cloud SQL, self-managed databases)"
-        tags:
-          - "database-access"
 
       - name: gke-primary
         region: asia-southeast1
@@ -36,24 +30,18 @@ vpc_networks: #{} #none
             ip_cidr_range: 10.1.0.0/20
           - range_name: gke-services
             ip_cidr_range: 10.50.0.0/17
-        tags:
-          - "gke-nodes"
 
       - name: serverless-cloudrun
         region: asia-southeast1
         ip_cidr_range: 10.0.6.0/24
         private_ip_google_access: false
         description: "Subnet for Serverless VPC Access for Cloud Run"
-        tags:
-          - "cloudrun-connector"
 
       - name: compute-vm
         region: asia-southeast1
         ip_cidr_range: 10.0.7.0/24
         private_ip_google_access: false
         description: "Subnet for general purpose Compute Engine VMs"
-        tags:
-          - "general-vm"
 
       - name: loadbalancer-proxy
         region: asia-southeast1
@@ -62,5 +50,3 @@ vpc_networks: #{} #none
         role: ACTIVE
         private_ip_google_access: false
         description: "Dedicated proxy-only subnet for internal HTTP(S) Load Balancers"
-        tags:
-          - "lb-proxy"

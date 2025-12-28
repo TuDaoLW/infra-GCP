@@ -1,0 +1,229 @@
+---
+cloudsql_instances:
+  postgres-prod:
+    database_version: "POSTGRES_15"
+    region: "asia-southeast1"
+    machine_type: "db-custom-1-3840"
+    disk_type: "PD_SSD"
+    disk_size_gb: 10
+    disk_autoresize: true
+    disk_autoresize_limit: 50
+    high_availability: false
+    public_ip: false
+    private_network_self_link: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+
+    ssl_mode: "ENCRYPTED_ONLY"
+
+    backup_enabled: true
+    backup_start_time: "02:00"
+    point_in_time_recovery_enabled: true
+    retained_backups: 14
+    deletion_protection: false
+
+    databases:
+      app_db: {}
+      analytics_db: {}
+
+    users:
+      app_user:
+        password: "super-secure-change-in-secrets-manager"
+      readonly_user:
+        password: "readonly-pass"
+
+  # 1. Basic Private Postgres (minimal, production-like)
+  # postgres-basic:
+  #   database_version: "POSTGRES_15"
+  #   region: "asia-southeast1"
+  #   machine_type: "db-custom-2-7680"          # 2 vCPU, 7.5 GB RAM
+  #   disk_type: "PD_SSD"
+  #   disk_size_gb: 20
+  #   disk_autoresize: true
+  #   disk_autoresize_limit: 200
+  #   high_availability: false
+  #   public_ip: false
+  #   private_network_self_link: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+  #   ssl_mode: "ENCRYPTED_ONLY"
+  #   backup_enabled: true
+  #   backup_start_time: "03:00"
+  #   point_in_time_recovery_enabled: true
+  #   retained_backups: 7
+  #   deletion_protection: false
+
+  #   databases:
+  #     basic_db: {}
+
+  #   users:
+  #     basic_user:
+  #       password: "basic-pass-123"
+
+  # 2. High Availability + Maintenance Window + Flags + Insights
+  # postgres-ha:
+  #   database_version: "POSTGRES_15"
+  #   region: "asia-southeast1"
+  #   machine_type: "db-custom-4-15360"         # 4 vCPU, 15 GB RAM
+  #   disk_type: "PD_SSD"
+  #   disk_size_gb: 50
+  #   disk_autoresize: true
+  #   high_availability: true                   # Regional HA
+  #   public_ip: false
+  #   private_network_self_link: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+  #   ssl_mode: "ENCRYPTED_ONLY"
+  #   deletion_protection: false
+  #   backup_enabled: true
+  #   backup_start_time: "04:00"
+  #   point_in_time_recovery_enabled: true
+  #   retained_backups: 30
+
+  #   maintenance_window:
+  #     day: 7   # Sunday (1 = Monday, 7 = Sunday)
+  #     hour: 5  # 05:00 UTC
+
+  #   database_flags:
+  #     log_min_messages: "warning"
+  #     log_min_error_statement: "error"
+  #     max_connections: "500"
+  #     shared_buffers: "524288"   # 25% of RAM guideline
+
+  #   query_insights_enabled: true
+  #   record_application_tags: true
+  #   record_client_address: true
+  #   query_plans_per_minute: 10
+
+  #   databases:
+  #     ha_app_db: {}
+  #     logs_db: {}
+
+  #   users:
+  #     ha_app_user:
+  #       password: "ha-secure-pass"
+  #     analytics_user:
+  #       password: "analytics-pass"
+
+  # 3. Public IP Instance (for testing direct access from Cloud Shell)
+  # postgres-public:
+  #   database_version: "POSTGRES_15"
+  #   region: "asia-southeast1"
+  #   machine_type: "db-custom-1-3840"
+  #   disk_type: "PD_SSD"
+  #   disk_size_gb: 10
+  #   disk_autoresize: false
+  #   high_availability: false
+  #   public_ip: true                           # Public endpoint
+  #   private_network_self_link: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+  #   ssl_mode: "ENCRYPTED_ONLY"
+  #   deletion_protection: false
+  #   backup_enabled: false                     # Disable for test instance
+
+  #   authorized_networks:                      # Required when public_ip = true
+  #     - name: "cloud-shell"
+  #       value: "35.191.0.0/16"
+  #     - name: "cloud-shell-2"
+  #       value: "130.211.0.0/22"
+  #     # - name: "my-home-ip"
+  #     #   value: "YOUR_HOME_IP/32"              # Replace with your IP for testing
+
+  #   databases:
+  #     public_db: {}
+
+  #   users:
+  #     public_user:
+  #       password: "public-test-pass"
+
+  # 4. Shared-Core Cheap Instance (dev/test only)
+  # postgres-micro:
+  #   database_version: "POSTGRES_15"
+  #   region: "asia-southeast1"
+  #   machine_type: "db-f1-micro"               # Shared core, very cheap
+  #   disk_size_gb: 10
+  #   public_ip: false
+  #   private_network_self_link: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+  #   ssl_mode: "ALLOW_UNENCRYPTED_AND_ENCRYPTED"  # Less strict for dev
+  #   backup_enabled: false
+  #   deletion_protection: false
+
+  #   databases:
+  #     micro_db: {}
+
+  #   users:
+  #     micro_user:
+  #       password: "micro-pass"
+
+  # # 1. MySQL 8.0 - Production-like with HA, PITR via binary logs, private IP
+  # mysql-prod:
+  #   database_version: "MYSQL_8_0"
+  #   region: "asia-southeast1"
+  #   machine_type: "db-custom-4-15360"      # 4 vCPU, 15 GB RAM
+  #   disk_type: "PD_SSD"
+  #   disk_size_gb: 100
+  #   disk_autoresize: true
+  #   disk_autoresize_limit: 500
+  #   high_availability: true                # Regional failover
+  #   public_ip: false
+  #   private_network_self_link: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+  #   ssl_mode: "ENCRYPTED_ONLY"
+
+  #   backup_enabled: true
+  #   backup_start_time: "02:00"
+  #   # MySQL uses binary_log_enabled for PITR (automatically enabled when backups are on)
+  #   retained_backups: 30
+  #   deletion_protection: false
+
+  #   maintenance_window:
+  #     day: 7                               # Sunday
+  #     hour: 3                              # 03:00 UTC
+
+  #   database_flags:
+  #     innodb_buffer_pool_size: "10737418240"  # 10 GB
+  #     max_connections: "500"
+  #     log_output: "FILE"
+
+  #   query_insights_enabled: true
+
+  #   databases:
+  #     app_db:
+  #       charset: "utf8mb4"
+  #       collation: "utf8mb4_unicode_ci"
+  #     analytics_db:
+  #       charset: "utf8mb4"
+  #       collation: "utf8mb4_unicode_ci"
+
+  #   users:
+  #     app_user:
+  #       password: "mysql-app-secure-pass"
+  #     readonly_user:
+  #       password: "mysql-readonly-pass"
+  #       host: "%"
+
+  # # 3. SQL Server 2019 - Enterprise features, Windows auth optional, HA
+  # sqlserver-enterprise:
+  #   database_version: "SQLSERVER_2019_ENTERPRISE"
+  #   region: "asia-southeast1"
+  #   machine_type: "db-custom-4-16384"       # 4 vCPU, 16 GB (SQL Server needs more RAM)
+  #   disk_type: "PD_SSD"
+  #   disk_size_gb: 50
+  #   disk_autoresize: true
+  #   high_availability: true
+  #   public_ip: false
+  #   private_network_self_link: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+  #   ssl_mode: "ALLOW_UNENCRYPTED_AND_ENCRYPTED"
+  #   root_password: "SuperSecureSQLServerPass123!"
+  #   backup_enabled: true
+  #   backup_start_time: "04:00"
+  #   point_in_time_recovery_enabled: true
+  #   retained_backups: 21
+  #   deletion_protection: false
+
+  #   database_flags:
+  #     # Example SQL Server flags
+  #     "cross db ownership chaining": "off"
+  #     "contained database authentication": "on"
+
+  #   databases:
+  #     erp_db: {}
+  #     reporting_db: {}
+
+  #   users:
+  #     sql_app_user:
+  #       password: "sqlserver-secure-pass"
+  #     sa_user:
+  #       password: "sa-strong-password"       # Avoid using sa in prod!

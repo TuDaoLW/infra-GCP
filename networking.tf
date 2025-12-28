@@ -13,6 +13,16 @@ module "vpcs" {
   subnets                 = try(each.value.subnets, [])
 }
 
+module "psa" {
+  for_each = module.vpcs  # One per VPC
+
+  source = "./module/psa"
+
+  project_id        = var.project_id
+  vpc_name          = each.key
+  network_self_link = each.value.vpc_self_link
+}
+
 module "nat" {
   for_each = try(local.config.cloud_nat_gateways, {})
 
