@@ -44,6 +44,7 @@ iam_role_bindings:
   gke-node-logging-binding:
     role: "roles/logging.logWriter"
     members:
+      - "serviceAccount:cloudrun-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
       - "serviceAccount:gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
     resource_id: "stone-booking-482114-v1"
     resource_type: "project"
@@ -52,6 +53,7 @@ iam_role_bindings:
   gke-node-monitoring-binding:
     role: "roles/monitoring.metricWriter"
     members:
+      - "serviceAccount:cloudrun-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
       - "serviceAccount:gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
     resource_id: "stone-booking-482114-v1"
     resource_type: "project"
@@ -64,3 +66,35 @@ iam_role_bindings:
     resource_id: "stone-booking-482114-v1"
     resource_type: "project"
     description: "Required minimum role for GKE node service account."
+
+# --------------- CR
+  cloudrun-service-agent:
+    role: "roles/run.serviceAgent"
+    members:
+      - "serviceAccount:cloudrun-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
+    resource_id: "stone-booking-482114-v1"
+    resource_type: "project"
+
+  # Pull images from Artifact Registry (recommended over GCR)
+  cloudrun-artifact-registry:
+    role: "roles/artifactregistry.reader"
+    members:
+      - "serviceAccount:cloudrun-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
+    resource_id: "stone-booking-482114-v1"
+    resource_type: "project"
+
+  # Access to private Cloud SQL (via Direct VPC egress)
+  cloudrun-cloudsql-client:
+    role: "roles/cloudsql.client"
+    members:
+      - "serviceAccount:cloudrun-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
+    resource_id: "stone-booking-482114-v1"
+    resource_type: "project"
+
+  cloudrun-agent-token-creator:
+    role: "roles/iam.serviceAccountTokenCreator"
+    members:
+      - "serviceAccount:service-164834404784@serverless-robot-prod.iam.gserviceaccount.com"  # Cloud Run runtime agent
+    resource_id: "cloudrun-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
+    resource_type: "serviceAccount"  # Important: bind on the target SA
+    description: "Allows Cloud Run agent to impersonate cloudrun-sa"

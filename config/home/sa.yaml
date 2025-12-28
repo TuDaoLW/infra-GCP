@@ -11,3 +11,9 @@ service_accounts:
     display_name: "Service Account for GKE Nodes"
     description: "Used by GKE worker nodes to access Google Cloud APIs (e.g., pulling images, writing logs)."
     project_id: stone-booking-482114-v1
+
+  cloudrun-sa:
+    account_id: cloudrun-sa
+    display_name: "Service Account for cloudrun"
+    description: "cloudrun sa."
+    project_id: stone-booking-482114-v1

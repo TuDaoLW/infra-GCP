@@ -34,4 +34,5 @@ module "cloudsql" {
 
   databases = try(each.value.databases, {})
   users     = try(each.value.users, {})
+  depends_on = [ module.psa ]
 }

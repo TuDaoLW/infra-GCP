@@ -1,0 +1,15 @@
+---
+cloudrun_services:
+  nginx-direct-vpc:
+    container_image: "nginx:latest"
+    container_port: 80
+    min_instances: 1
+    max_instances: 5
+    allow_unauthenticated: true
+
+    service_account_email: "cloudrun-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
+
+    direct_vpc_enabled: true
+    network_self_link: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+    subnetwork_self_link: "projects/stone-booking-482114-v1/regions/asia-southeast1/subnetworks/gke-primary"
+    vpc_egress_setting: "ALL_TRAFFIC"
