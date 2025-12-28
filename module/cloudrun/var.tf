@@ -91,7 +91,7 @@ variable "network_tags" {
 
 variable "vpc_egress_setting" {
   type        = string
-  default     = "ALL_TRAFFIC"
+  default     = "PRIVATE_RANGES_ONLY"
   description = "ALL_TRAFFIC or PRIVATE_RANGES_ONLY"
 }
 
@@ -105,4 +105,16 @@ variable "allow_unauthenticated" {
 variable "custom_domain" {
   type        = string
   default     = null
+}
+
+variable "max_concurrency" {
+  type        = number
+  default     = 80
+  description = "Max concurrent requests per instance (higher = fewer instances = lower cost)"
+}
+
+variable "request_based_billing" {
+  type        = bool
+  default     = true
+  description = "Enable request-based billing (true = pay only during request processing)"
 }

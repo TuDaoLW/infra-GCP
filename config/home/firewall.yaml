@@ -1,7 +1,7 @@
 ---
 firewall_rules: #{} #none
   allow-master-to-nodes:
-    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+    network: "projects/test-482612/global/networks/sample-vpc"
     direction: INGRESS
     priority: 100 
     action: ALLOW
@@ -13,7 +13,7 @@ firewall_rules: #{} #none
     description: "Allows GKE control plane to communicate with nodes (required for private clusters)."
 
   allow-node-to-master:
-    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+    network: "projects/test-482612/global/networks/sample-vpc"
     direction: INGRESS
     priority: 100 
     action: ALLOW
@@ -25,7 +25,7 @@ firewall_rules: #{} #none
     description: "Allows GKE control plane to communicate with nodes (required for private clusters)."
 
   allow-iap-ssh:
-    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+    network: "projects/test-482612/global/networks/sample-vpc"
     direction: INGRESS
     priority: 110
     action: ALLOW
@@ -39,7 +39,7 @@ firewall_rules: #{} #none
 
   # internal VPC communication
   # allow-internal-all-subnets:
-  #   network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+  #   network: "projects/test-482612/global/networks/sample-vpc"
   #   direction: INGRESS
   #   priority: 300
   #   action: ALLOW
@@ -56,36 +56,33 @@ firewall_rules: #{} #none
   #   description: "Allows all TCP/UDP/ICMP communication between internal subnets within the 'sample-vpc'."
 
   allow-internal-all-subnets:
-    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+    network: "projects/test-482612/global/networks/sample-vpc"
     direction: INGRESS
     priority: 300
     action: ALLOW
     source_ranges:
       - "10.0.0.0/8"         
       - "172.16.0.0/12"      
-      - "192.168.0.0/16"   
     protocols:
       - protocol: all       
     description: "Allows full internal communication including to GKE private control plane."
 
   # Load Balancer Health Check Rules (Required for Load Balancers)
   allow-lb-health-checks: # Allows Google Cloud Load Balancer health probes
-    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+    network: "projects/test-482612/global/networks/sample-vpc"
     direction: INGRESS
     priority: 500
     action: ALLOW
     source_ranges:
       - "35.191.0.0/16" # Ranges for external HTTP(S), SSL Proxy, TCP Proxy LB health checks
       - "130.211.0.0/22" # Ranges for all Load Balancer health checks
-      - "209.85.152.0/22" # Additional range for Internal TCP/UDP Load Balancer health checks
-      - "209.85.204.0/22" # Additional range for Internal TCP/UDP Load Balancer health checks
       # These ranges are published by Google and should be kept up to date.
     # Target can be specific tags (e.g., 'gke-node', 'application-backend')
     # or specific service accounts if more granular targeting is needed.
     # For GKE, target_tags on the node pool is often easiest.
     target_tags: ["gke-node", "application-backend", "management-server"]
     # If target_service_accounts is preferred:
-    # target_service_accounts: ["gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"]
+    # target_service_accounts: ["gke-node-sa@test-482612.iam.gserviceaccount.com"]
     protocols:
       - protocol: tcp
         ports: ["80", "443", "8080", "8443", "10250"]
@@ -96,7 +93,7 @@ firewall_rules: #{} #none
   # ------------------------------------------------------------------------
 
   allow-egress-to-internet: # Outbound connections to the internet
-    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+    network: "projects/test-482612/global/networks/sample-vpc"
     direction: EGRESS
     priority: 1100 # Default priority for general outbound rules
     action: ALLOW
@@ -114,7 +111,7 @@ firewall_rules: #{} #none
     description: "Allows specified instances to make outbound connections to the internet on common ports."
 
   allow-internal-icmp: # Allow ICMP for internal network diagnostics
-    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+    network: "projects/test-482612/global/networks/sample-vpc"
     direction: INGRESS
     priority: 400
     action: ALLOW

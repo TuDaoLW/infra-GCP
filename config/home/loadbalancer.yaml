@@ -1,9 +1,9 @@
 load_balancer:
   prod-global-app-lb-shared:
-    project_id: stone-booking-482114-v1
+    project_id: test-482612
     frontend:
       name: prod-global-lb-frontend-shared
-      project_id: stone-booking-482114-v1
+      project_id: test-482612
       create_address: true
       ssl: true
       managed_ssl_certificate_domains:
@@ -26,7 +26,7 @@ load_balancer:
     # --- Backend Service for the VM Group (MIG) ---
     backend_service_vm_group:
       name: prod-vm-group-backend-service
-      project_id: stone-booking-482114-v1
+      project_id: test-482612
       load_balancing_scheme: EXTERNAL_MANAGED
       protocol: HTTP
       health_check:
@@ -42,7 +42,7 @@ load_balancer:
     # --- Backend Service for the Single VM ---
     backend_service_single_vm:
       name: prod-single-vm-backend-service
-      project_id: stone-booking-482114-v1
+      project_id: test-482612
       load_balancing_scheme: EXTERNAL_MANAGED
       protocol: HTTP
       health_check:
@@ -58,7 +58,7 @@ load_balancer:
     # --- Backend Service for Cloud Run ---
     backend_service_cloud_run:
       name: prod-cloud-run-backend-service
-      project_id: stone-booking-482114-v1
+      project_id: test-482612
       load_balancing_scheme: EXTERNAL_MANAGED
       protocol: HTTP
       # This backend points to a Serverless NEG for your Cloud Run service

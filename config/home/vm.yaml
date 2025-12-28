@@ -1,77 +1,70 @@
 ---
-# compute_instances:
-#   management-vm-01: #new format
-#     project_id: stone-booking-482114-v1
-#     zone: asia-southeast1-b
-#     machine_type: e2-small
-#     description: "Management VM for administrative tasks and tooling"
-#     service_account: management-vm-sa
-#     disks:
-#       - device_name: boot-disk
-#         boot: true
-#         auto_delete: true
-#         initialize_params:
-#           image: "projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts" # Full image selfLink
-#           size_gb: 24
-#           type: pd-balanced
+compute_instances:
+  management-vm-01: #new format
+    project_id: test-482612
+    zone: asia-southeast1-b
+    machine_type: e2-micro
+    description: "Management VM for administrative tasks and tooling"
+    service_account: management-vm-sa
+    disks:
+      - device_name: boot-disk
+        boot: true
+        auto_delete: true
+        initialize_params:
+          image: "projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts" # Full image selfLink
+          size_gb: 20
+          type: pd-standard
 
-#       # - device_name: data-disk-01
-#       #   boot: false
-#       #   auto_delete: false
-#       #   initialize_params:
-#       #     size_gb: 20
-#       #     type: pd-balanced
+    network_interfaces: # Standardized to snake_case
+      - subnetwork: "projects/test-482612/regions/asia-southeast1/subnetworks/management" # Full subnetwork selfLink recommended
+        # Private IP Configuration:
+        network_ip: "10.0.0.10"
 
-#     network_interfaces: # Standardized to snake_case
-#       - subnetwork: "projects/stone-booking-482114-v1/regions/asia-southeast1/subnetworks/management" # Full subnetwork selfLink recommended
-#         # Private IP Configuration:
-#         network_ip: "10.0.0.10"
+    metadata:
+      enable-oslogin: "TRUE" # string
+      startup-script: |
+        #!/bin/bash
+        sudo apt-get install apt-transport-https ca-certificates gnupg curl -y
+        curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+        echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
 
-#     metadata:
-#       enable-oslogin: "TRUE" # string
-#       startup-script: |
-#         #!/bin/bash
-#         sudo apt-get install apt-transport-https ca-certificates gnupg curl -y
-#         curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
-#         echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+        rm kubectl
 
-#         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-#         sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-#         rm kubectl
+        sudo apt-get update && sudo apt-get install google-cloud-sdk-gke-gcloud-auth-plugin postgresql-client -y
+        cat <<EOF | sudo tee /etc/profile.d/kubectl_settings.sh
+        source <(kubectl completion bash)
+        alias k=kubectl
+        complete -o default -F __start_kubectl k
+        export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+        EOF
+        sudo chmod +x /etc/profile.d/kubectl_settings.sh
 
-#         sudo apt-get update && sudo apt-get install google-cloud-sdk-gke-gcloud-auth-plugin -y
-#         cat <<EOF | sudo tee /etc/profile.d/kubectl_settings.sh
-#         source <(kubectl completion bash)
-#         alias k=kubectl
-#         complete -o default -F __start_kubectl k
-#         export USE_GKE_GCLOUD_AUTH_PLUGIN=True
-#         EOF
-#         sudo chmod +x /etc/profile.d/kubectl_settings.sh
+        # sudo apt-get update
+        # sudo apt-get install -y nginx
+        # echo "Hello from management-vm-01!" | sudo tee /var/www/html/index.html
+      shutdown-script: |
+        #!/bin/bash
+        echo "Running shutdown script for management-vm-01..."
+        # Add your shutdown commands here, e.g., graceful service shutdown, data sync
+        echo "Shutdown script finished."
 
-#         # sudo apt-get update
-#         # sudo apt-get install -y nginx
-#         # echo "Hello from management-vm-01!" | sudo tee /var/www/html/index.html
-#       shutdown-script: |
-#         #!/bin/bash
-#         echo "Running shutdown script for management-vm-01..."
-#         # Add your shutdown commands here, e.g., graceful service shutdown, data sync
-#         echo "Shutdown script finished."
+    tags: # Network tags for firewall rules
+      - "management-server"
+      - "ssh-allowed"
+      - "outbound-http"
+      - "iap-ssh"
 
-#     tags: # Network tags for firewall rules and route targeting
-#       - "management-server"
-#       - "ssh-allowed"
-#       - "outbound-http"
-#       - "iap-ssh"
+    extra_labels:
+      application: "management-tools"
+      service: "ssh-gateway"
 
-#     extra_labels:
-#       application: "management-tools"
-#       service: "ssh-gateway"
-
-#     can_ip_forward: false # false unless acting as a NAT gateway or router
-#     deletion_protection: false
-#     confidential_instance_config: # only some specific machine types support this
-#       enable_confidential_compute: false
-#     shielded_instance_config: # Recommended for all production VMs
-#       enable_secure_boot: true
-#       enable_vtpm: true
-#       enable_integrity_monitoring: true
+    can_ip_forward: false
+    deletion_protection: false
+    confidential_instance_config:
+      enable_confidential_compute: false
+    shielded_instance_config:
+      enable_secure_boot: true
+      enable_vtpm: true
+      enable_integrity_monitoring: true

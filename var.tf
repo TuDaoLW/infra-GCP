@@ -7,7 +7,7 @@ variable "env" {
 variable "project_id" {
   description = "GCP Project ID"
   type        = string
-  default     = "stone-booking-482114-v1"
+  default     = "test-482612"
 }
 
 variable "region" {

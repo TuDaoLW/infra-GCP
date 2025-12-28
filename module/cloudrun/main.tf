@@ -5,6 +5,7 @@ resource "google_cloud_run_v2_service" "service" {
   description = var.description
 
   template {
+    max_instance_request_concurrency = var.max_concurrency
     containers {
       image = var.container_image
 
@@ -17,6 +18,7 @@ resource "google_cloud_run_v2_service" "service" {
           cpu    = var.cpu_limit
           memory = var.memory_limit
         }
+        cpu_idle = var.request_based_billing
       }
 
       dynamic "env" {

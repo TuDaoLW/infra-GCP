@@ -1,7 +1,7 @@
 ---
-vpc_networks: #{} #none
+vpc_networks:
   sample-vpc:
-    project_id: stone-booking-482114-v1
+    project_id: test-482612
     auto_create_subnetworks: false 
     routing_mode: REGIONAL
     mtu: 1460
@@ -14,12 +14,6 @@ vpc_networks: #{} #none
         private_ip_google_access: true
         description: "Subnet for management VMs and tools"
 
-      - name: databases
-        region: asia-southeast1
-        ip_cidr_range: 10.0.1.0/24
-        private_ip_google_access: true
-        description: "Subnet for database instances (e.g., Cloud SQL, self-managed databases)"
-
       - name: gke-primary
         region: asia-southeast1
         ip_cidr_range: 10.0.2.0/23
@@ -31,17 +25,11 @@ vpc_networks: #{} #none
           - range_name: gke-services
             ip_cidr_range: 10.50.0.0/17
 
-      - name: serverless-cloudrun
+      - name: cloudrun
         region: asia-southeast1
-        ip_cidr_range: 10.0.6.0/24
-        private_ip_google_access: false
-        description: "Subnet for Serverless VPC Access for Cloud Run"
-
-      - name: compute-vm
-        region: asia-southeast1
-        ip_cidr_range: 10.0.7.0/24
-        private_ip_google_access: false
-        description: "Subnet for general purpose Compute Engine VMs"
+        ip_cidr_range: 10.0.4.0/22
+        private_ip_google_access: true
+        description: "Subnet for Cloud Run"
 
       - name: loadbalancer-proxy
         region: asia-southeast1

@@ -5,4 +5,4 @@ metadata:
   namespace: default
   annotations:
     # This annotation links the KSA to the GSA. This is the magic of Workload Identity.
-    iam.gke.io/gcp-service-account: my-app-gsa@stone-booking-482114-v1.iam.gserviceaccount.com
+    iam.gke.io/gcp-service-account: my-app-gsa@test-482612.iam.gserviceaccount.com

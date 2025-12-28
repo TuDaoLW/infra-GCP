@@ -1,42 +1,40 @@
 ---
-cloud_routers: #{} #none
-  asia-southeast1-nat-router:
-    project_id: stone-booking-482114-v1
-    vpc_name: "sample-vpc"
-    region: asia-southeast1
-    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
-    description: "Cloud Router for Cloud NAT gateway in asia-southeast1."
+# cloud_routers:
+#   asia-southeast1-nat-router:
+#     project_id: test-482612
+#     vpc_name: "sample-vpc"
+#     region: asia-southeast1
+#     network: "projects/test-482612/global/networks/sample-vpc"
+#     description: "Cloud Router for Cloud NAT gateway in asia-southeast1."
 
-cloud_nat_gateways: #{} #none
-  asia-southeast1-public-nat:
-    project_id: stone-booking-482114-v1
-    vpc_name: "sample-vpc"
-    region: asia-southeast1
-    router_name: "asia-southeast1-nat-router"
-    network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
-    nat_ip_allocation_mode: "AUTO_ONLY" # AUTO_ONLY for dynamic IP allocation
-    # For static IPs, list of pre-reserved IP addresses:
-    # nat_ips:
-    #   - "projects/stone-booking-482114-v1/regions/asia-southeast1/addresses/nat-ip-01"
-    #   - "projects/stone-booking-482114-v1/regions/asia-southeast1/addresses/nat-ip-02"
-    source_subnetwork_ip_ranges_to_nat: "LIST_OF_SUBNETWORKS" # Or "ALL_SUBNETWORKS_ALL_IP_RANGES"
-    # LIST_OF_SUBNETWORKS is highly recommended for granular control.
-    subnetworks:
-      - name: "management"
-        source_ip_ranges_to_nat: ["ALL_IP_RANGES"]
-      - name: "gke-primary"
-        source_ip_ranges_to_nat: ["ALL_IP_RANGES"] #["PRIMARY_IP_RANGE"] or ["SECONDARY_IP_RANGE_NAME"]
-      - name: "compute-vm"
-        source_ip_ranges_to_nat: ["ALL_IP_RANGES"]
-      # Exclude 'serverless-cloudrun' and 'loadbalancer-proxy' if they don't need direct outbound internet via NAT
-      # Cloud Run services using Direct VPC Egress with 'all-traffic' and Cloud NAT can use this,
-      # but often use their own mechanisms or Private Google Access if only Google APIs are needed.
-      # Proxy-only subnets for LBs typically don't initiate their own traffic to the internet.
-    log_config: # Enable logging for auditability and troubleshooting
-      enable: true
-      filter: "ALL" # ALL, ERRORS_ONLY, or TRANSLATIONS_ONLY
-    min_ports_per_vm: 64 # Default, or increase if many concurrent connections per VM are expected
-    icmp_idle_timeout_sec: 30 # Default
-    tcp_established_idle_timeout_sec: 1200 # Default (20 min)
-    tcp_transitory_idle_timeout_sec: 30 # Default
-    udp_idle_timeout_sec: 30 # Default
+# cloud_nat_gateways:
+#   asia-southeast1-public-nat:
+#     project_id: test-482612
+#     vpc_name: "sample-vpc"
+#     region: asia-southeast1
+#     router_name: "asia-southeast1-nat-router"
+#     network: "projects/test-482612/global/networks/sample-vpc"
+#     nat_ip_allocation_mode: "AUTO_ONLY" # AUTO_ONLY for dynamic IP allocation
+#     # For static IPs, list of pre-reserved IP addresses:
+#     # nat_ips:
+#     #   - "projects/test-482612/regions/asia-southeast1/addresses/nat-ip-01"
+#     #   - "projects/test-482612/regions/asia-southeast1/addresses/nat-ip-02"
+#     source_subnetwork_ip_ranges_to_nat: "LIST_OF_SUBNETWORKS" # Or "ALL_SUBNETWORKS_ALL_IP_RANGES"
+#     # LIST_OF_SUBNETWORKS is highly recommended for granular control.
+#     subnetworks:
+#       - name: "management"
+#         source_ip_ranges_to_nat: ["ALL_IP_RANGES"]
+#       - name: "gke-primary"
+#         source_ip_ranges_to_nat: ["ALL_IP_RANGES"] #["PRIMARY_IP_RANGE"] or ["SECONDARY_IP_RANGE_NAME"]
+#       # Exclude 'serverless-cloudrun' and 'loadbalancer-proxy' if they don't need direct outbound internet via NAT
+#       # Cloud Run services using Direct VPC Egress with 'all-traffic' and Cloud NAT can use this,
+#       # but often use their own mechanisms or Private Google Access if only Google APIs are needed.
+#       # Proxy-only subnets for LBs typically don't initiate their own traffic to the internet.
+#     log_config: # Enable logging for auditability and troubleshooting
+#       enable: true
+#       filter: "ERRORS_ONLY" # ALL, ERRORS_ONLY, or TRANSLATIONS_ONLY
+#     min_ports_per_vm: 128 # Default, or increase if many concurrent connections per VM are expected
+#     icmp_idle_timeout_sec: 30 # Default
+#     tcp_established_idle_timeout_sec: 1200 # Default (20 min)
+#     tcp_transitory_idle_timeout_sec: 30 # Default
+#     udp_idle_timeout_sec: 30 # Default

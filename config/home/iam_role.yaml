@@ -3,7 +3,7 @@ iam_roles:
   management-vm-operator-role:
     role_id: managementVmOperator
     title: "Management VM Operator"
-    project_id: stone-booking-482114-v1
+    project_id: test-482612
     stage: GA
     permissions:
       - "logging.logEntries.create"

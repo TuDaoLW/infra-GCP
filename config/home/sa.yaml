@@ -4,16 +4,16 @@ service_accounts:
     account_id: management-vm-sa
     display_name: "Service Account for Management VM"
     description: "Used by the management VM for OS Login, logging, monitoring, and script access to Google Cloud services."
-    project_id: stone-booking-482114-v1
+    project_id: test-482612
 
   gke-node-sa:
     account_id: gke-node-sa
     display_name: "Service Account for GKE Nodes"
     description: "Used by GKE worker nodes to access Google Cloud APIs (e.g., pulling images, writing logs)."
-    project_id: stone-booking-482114-v1
+    project_id: test-482612
 
   cloudrun-sa:
     account_id: cloudrun-sa
     display_name: "Service Account for cloudrun"
     description: "cloudrun sa."
-    project_id: stone-booking-482114-v1
+    project_id: test-482612
