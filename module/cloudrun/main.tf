@@ -3,7 +3,9 @@ resource "google_cloud_run_v2_service" "service" {
   location    = var.region
   project     = var.project_id
   description = var.description
-
+  ingress = var.ingress 
+  # default_uri_disabled = var.default_uri_disabled
+  # Unexpected attribute: An attribute named "default_uri_disabled" is not expected hereTerraform
   template {
     max_instance_request_concurrency = var.max_concurrency
     containers {

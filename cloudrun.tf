@@ -27,7 +27,8 @@ module "cloudrun" {
   subnetwork_self_link = try(each.value.subnetwork_self_link, null)
   network_tags         = try(each.value.network_tags, [])
   vpc_egress_setting   = try(each.value.vpc_egress_setting, "PRIVATE_RANGES_ONLY")
-
+  ingress              = try(each.value.ingress, "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER_ONLY")
+  # default_uri_disabled = try(each.value.default_uri_disabled, true)
   allow_unauthenticated = try(each.value.allow_unauthenticated, true)
   custom_domain         = try(each.value.custom_domain, null)
   depends_on            = [module.iam_bindings]

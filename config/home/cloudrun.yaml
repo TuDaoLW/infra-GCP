@@ -5,14 +5,15 @@ cloudrun_services:
     container_port: 80
     description: "Cost-optimized nginx test with Direct VPC Egress (private-ranges-only)"
 
-    cpu_limit: "1"          # Half CPU — sufficient for nginx; enables request-based billing
-    memory_limit: "256Mi"     # Minimal memory for static serving
-    request_based_billing: false
-    min_instances: 0          # Scale to zero when idle → huge savings
-    max_instances: 2          # Low cap for testing (increase later if needed)
-
-    # Add these to your module variables (recommended)
-    max_concurrency: 200    # Uncomment once you add the variable — big saver!
+    cpu_limit: "0.5"        
+    memory_limit: "256Mi"    
+    request_based_billing: true
+    min_instances: 0         
+    max_instances: 1         
+    ingress: "INGRESS_TRAFFIC_ALL"  
+    # INGRESS_TRAFFIC_INTERNAL_ONLY, INGRESS_TRAFFIC_ALL, INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER
+    default_uri_disabled: false                            
+    max_concurrency: 1  
     
     service_account_email: "cloudrun-sa@test-482612.iam.gserviceaccount.com"
 
@@ -22,6 +23,7 @@ cloudrun_services:
     network_self_link: "projects/test-482612/global/networks/sample-vpc"
     subnetwork_self_link: "projects/test-482612/regions/asia-southeast1/subnetworks/cloudrun"  # Your large /22 subnet
     vpc_egress_setting: "PRIVATE_RANGES_ONLY"
+    custom_domain: nginx.tudaolw.io.vn
 
 #   nginx-direct-vpc:
 #     container_image: "nginx:latest"

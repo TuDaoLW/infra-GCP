@@ -95,12 +95,6 @@ variable "vpc_egress_setting" {
   description = "ALL_TRAFFIC or PRIVATE_RANGES_ONLY"
 }
 
-# Public access
-variable "allow_unauthenticated" {
-  type        = bool
-  default     = true
-}
-
 # Custom domain
 variable "custom_domain" {
   type        = string
@@ -117,4 +111,30 @@ variable "request_based_billing" {
   type        = bool
   default     = true
   description = "Enable request-based billing (true = pay only during request processing)"
+}
+
+variable "ingress" {
+  type        = string
+  default     = "INGRESS_TRAFFIC_ALL"
+  description = "Ingress settings. Options: INGRESS_TRAFFIC_ALL (public), INGRESS_TRAFFIC_INTERNAL_ONLY (VPC only), INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER_ONLY (LB + VPC)"
+  validation {
+    condition = contains([
+      "INGRESS_TRAFFIC_ALL",
+      "INGRESS_TRAFFIC_INTERNAL_ONLY",
+      "INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER"
+    ], var.ingress)
+    error_message = "Invalid ingress value. Use one of the supported options."
+  }
+}
+
+variable "default_uri_disabled" {
+  type        = bool
+  default     = false
+  description = "Disable the default run.app public URL (recommended for private services behind LB)"
+}
+
+variable "allow_unauthenticated" {
+  type        = bool
+  default     = false  # Change default to false for security
+  description = "Allow public unauthenticated access via IAM (only needed if ingress=ALL and no LB)"
 }
