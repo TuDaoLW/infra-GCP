@@ -1,0 +1,14 @@
+---
+firebase_hosting_sites:
+  nginx-site:
+    site_id: "nginx-test"
+    custom_domain: "nginx.tudaolw.io.vn"
+    region: "asia-southeast1"
+    hosting_config:
+      rewrites:
+        - glob: "/**"
+          run:
+            service_id: "nginx-test-optimized" 
+            region: "asia-southeast1"
+        # - glob: "**"
+        #   path: "/index.html"

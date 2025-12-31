@@ -2,6 +2,8 @@
 cloudrun_services:
   nginx-test-optimized:
     container_image: "nginx:latest"
+    # container_command: ["nginx", "-g", "daemon off;"]
+    # container_args: ["-c", "/etc/nginx/conf.d/proxy.conf"]
     container_port: 80
     description: "Cost-optimized nginx test with Direct VPC Egress (private-ranges-only)"
 
@@ -23,7 +25,7 @@ cloudrun_services:
     network_self_link: "projects/test-482612/global/networks/sample-vpc"
     subnetwork_self_link: "projects/test-482612/regions/asia-southeast1/subnetworks/cloudrun"  # Your large /22 subnet
     vpc_egress_setting: "PRIVATE_RANGES_ONLY"
-    custom_domain: nginx.tudaolw.io.vn
+    # custom_domain: nginx.tudaolw.io.vn
 
 #   nginx-direct-vpc:
 #     container_image: "nginx:latest"

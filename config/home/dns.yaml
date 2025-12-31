@@ -9,4 +9,4 @@ cloud_dns_zones:
         name: "nginx" 
         type: "CNAME"
         ttl: 300
-        rrdatas: ["ghs.googlehosted.com."]
+        rrdatas: ["nginx-test.web.app."]

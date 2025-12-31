@@ -6,6 +6,11 @@ terraform {
       source  = "hashicorp/google"
       version = "~> 5.45"
     }
+    # for cloudrun hosting via firebase
+    google-beta = {
+      source  = "hashicorp/google-beta"
+      version = "~> 6.0"
+    }
   }
 
   # backend "gcs" {
