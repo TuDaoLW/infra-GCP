@@ -1,15 +1,61 @@
 ---
 cloudrun_services:
-  nginx-direct-vpc:
+  nginx-test-optimized:
     container_image: "nginx:latest"
     container_port: 80
-    min_instances: 1
-    max_instances: 5
-    allow_unauthenticated: true
+    description: "Cost-optimized nginx test with Direct VPC Egress (private-ranges-only)"
 
-    service_account_email: "cloudrun-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
+    cpu_limit: "0.5"        
+    memory_limit: "256Mi"    
+    request_based_billing: true
+    min_instances: 0         
+    max_instances: 1         
+    ingress: "INGRESS_TRAFFIC_ALL"  
+    # INGRESS_TRAFFIC_INTERNAL_ONLY, INGRESS_TRAFFIC_ALL, INGRESS_TRAFFIC_INTERNAL_LOAD_BALANCER
+    default_uri_disabled: false                            
+    max_concurrency: 1  
+    
+    service_account_email: "cloudrun-sa@test-482612.iam.gserviceaccount.com"
+
+    allow_unauthenticated: true   # Public access for browser testing
 
     direct_vpc_enabled: true
-    network_self_link: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
-    subnetwork_self_link: "projects/stone-booking-482114-v1/regions/asia-southeast1/subnetworks/gke-primary"
-    vpc_egress_setting: "ALL_TRAFFIC"
+    network_self_link: "projects/test-482612/global/networks/sample-vpc"
+    subnetwork_self_link: "projects/test-482612/regions/asia-southeast1/subnetworks/cloudrun"  # Your large /22 subnet
+    vpc_egress_setting: "PRIVATE_RANGES_ONLY"
+    custom_domain: nginx.tudaolw.io.vn
+
+#   nginx-direct-vpc:
+#     container_image: "nginx:latest"
+#     container_port: 80
+#     min_instances: 0
+#     max_instances: 2
+#     concurrency: 80
+#     cpu_limit: "1"    
+#     memory_limit: "512Mi"
+#     allow_unauthenticated: true
+
+#     service_account_email: "cloudrun-sa@test-482612.iam.gserviceaccount.com"
+
+#     direct_vpc_enabled: true
+#     network_self_link: "projects/test-482612/global/networks/sample-vpc"
+#     subnetwork_self_link: "projects/test-482612/regions/asia-southeast1/subnetworks/cloudrun"
+#     vpc_egress_setting: "PRIVATE_RANGES_ONLY"
+
+  # nginx-request-based:
+  #   container_image: "nginx:latest"
+  #   container_port: 80
+  #   min_instances: 0
+  #   max_instances: 2
+  #   concurrency: 80
+  #   cpu_allocation: "REQUEST_ONLY" 
+  #   cpu_limit: "0.5-1"
+  #   memory_limit: "256Mi-512Mi"
+  #   allow_unauthenticated: true
+
+  #   service_account_email: "cloudrun-sa@test-482612.iam.gserviceaccount.com"
+
+  #   direct_vpc_enabled: true
+  #   network_self_link: "projects/test-482612/global/networks/sample-vpc"
+  #   subnetwork_self_link: "projects/test-482612/regions/asia-southeast1/subnetworks/cloudrun"
+  #   vpc_egress_setting: "PRIVATE_RANGES_ONLY"

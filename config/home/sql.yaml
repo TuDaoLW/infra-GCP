@@ -1,5 +1,29 @@
+# PGPASSWORD='change-me' psql "host=10.80.224.3 port=5432 user=test_user dbname=test"
 ---
 # cloudsql_instances:
+#   postgres-test:
+#     database_version: "POSTGRES_15" 
+#     region: "asia-southeast1"
+#     machine_type: "db-f1-micro"     
+#     disk_type: "PD_HDD"            
+#     disk_size_gb: 10               
+#     disk_autoresize: false        
+#     high_availability: false    
+#     public_ip: false              
+#     private_network_self_link: "projects/test-482612/global/networks/sample-vpc"
+#     ssl_mode: "ENCRYPTED_ONLY"    
+
+#     backup_enabled: false           
+#     point_in_time_recovery_enabled: false
+#     deletion_protection: false    
+
+#     databases:
+#       test: {}
+
+#     users:
+#       test_user:
+#         password: "change-me"
+
 #   postgres-prod:
 #     database_version: "POSTGRES_15"
 #     region: "asia-southeast1"
@@ -10,7 +34,7 @@
 #     disk_autoresize_limit: 50
 #     high_availability: false
 #     public_ip: false
-#     private_network_self_link: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+#     private_network_self_link: "projects/test-482612/global/networks/sample-vpc"
 
 #     ssl_mode: "ENCRYPTED_ONLY"
 
@@ -41,7 +65,7 @@
   #   disk_autoresize_limit: 200
   #   high_availability: false
   #   public_ip: false
-  #   private_network_self_link: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+  #   private_network_self_link: "projects/test-482612/global/networks/sample-vpc"
   #   ssl_mode: "ENCRYPTED_ONLY"
   #   backup_enabled: true
   #   backup_start_time: "03:00"
@@ -66,7 +90,7 @@
   #   disk_autoresize: true
   #   high_availability: true                   # Regional HA
   #   public_ip: false
-  #   private_network_self_link: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+  #   private_network_self_link: "projects/test-482612/global/networks/sample-vpc"
   #   ssl_mode: "ENCRYPTED_ONLY"
   #   deletion_protection: false
   #   backup_enabled: true
@@ -109,7 +133,7 @@
   #   disk_autoresize: false
   #   high_availability: false
   #   public_ip: true                           # Public endpoint
-  #   private_network_self_link: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+  #   private_network_self_link: "projects/test-482612/global/networks/sample-vpc"
   #   ssl_mode: "ENCRYPTED_ONLY"
   #   deletion_protection: false
   #   backup_enabled: false                     # Disable for test instance
@@ -136,7 +160,7 @@
   #   machine_type: "db-f1-micro"               # Shared core, very cheap
   #   disk_size_gb: 10
   #   public_ip: false
-  #   private_network_self_link: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+  #   private_network_self_link: "projects/test-482612/global/networks/sample-vpc"
   #   ssl_mode: "ALLOW_UNENCRYPTED_AND_ENCRYPTED"  # Less strict for dev
   #   backup_enabled: false
   #   deletion_protection: false
@@ -159,7 +183,7 @@
   #   disk_autoresize_limit: 500
   #   high_availability: true                # Regional failover
   #   public_ip: false
-  #   private_network_self_link: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+  #   private_network_self_link: "projects/test-482612/global/networks/sample-vpc"
   #   ssl_mode: "ENCRYPTED_ONLY"
 
   #   backup_enabled: true
@@ -204,7 +228,7 @@
   #   disk_autoresize: true
   #   high_availability: true
   #   public_ip: false
-  #   private_network_self_link: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
+  #   private_network_self_link: "projects/test-482612/global/networks/sample-vpc"
   #   ssl_mode: "ALLOW_UNENCRYPTED_AND_ENCRYPTED"
   #   root_password: "SuperSecureSQLServerPass123!"
   #   backup_enabled: true

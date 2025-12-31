@@ -1,9 +1,9 @@
 ---
 # compute_instances:
 #   management-vm-01: #new format
-#     project_id: stone-booking-482114-v1
+#     project_id: test-482612
 #     zone: asia-southeast1-b
-#     machine_type: e2-small
+#     machine_type: e2-micro
 #     description: "Management VM for administrative tasks and tooling"
 #     service_account: management-vm-sa
 #     disks:
@@ -12,18 +12,11 @@
 #         auto_delete: true
 #         initialize_params:
 #           image: "projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts" # Full image selfLink
-#           size_gb: 24
-#           type: pd-balanced
-
-#       # - device_name: data-disk-01
-#       #   boot: false
-#       #   auto_delete: false
-#       #   initialize_params:
-#       #     size_gb: 20
-#       #     type: pd-balanced
+#           size_gb: 20
+#           type: pd-standard
 
 #     network_interfaces: # Standardized to snake_case
-#       - subnetwork: "projects/stone-booking-482114-v1/regions/asia-southeast1/subnetworks/management" # Full subnetwork selfLink recommended
+#       - subnetwork: "projects/test-482612/regions/asia-southeast1/subnetworks/management" # Full subnetwork selfLink recommended
 #         # Private IP Configuration:
 #         network_ip: "10.0.0.10"
 
@@ -39,7 +32,7 @@
 #         sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 #         rm kubectl
 
-#         sudo apt-get update && sudo apt-get install google-cloud-sdk-gke-gcloud-auth-plugin -y
+#         sudo apt-get update && sudo apt-get install google-cloud-sdk-gke-gcloud-auth-plugin postgresql-client -y
 #         cat <<EOF | sudo tee /etc/profile.d/kubectl_settings.sh
 #         source <(kubectl completion bash)
 #         alias k=kubectl
@@ -57,7 +50,7 @@
 #         # Add your shutdown commands here, e.g., graceful service shutdown, data sync
 #         echo "Shutdown script finished."
 
-#     tags: # Network tags for firewall rules and route targeting
+#     tags: # Network tags for firewall rules
 #       - "management-server"
 #       - "ssh-allowed"
 #       - "outbound-http"
@@ -67,11 +60,11 @@
 #       application: "management-tools"
 #       service: "ssh-gateway"
 
-#     can_ip_forward: false # false unless acting as a NAT gateway or router
+#     can_ip_forward: false
 #     deletion_protection: false
-#     confidential_instance_config: # only some specific machine types support this
+#     confidential_instance_config:
 #       enable_confidential_compute: false
-#     shielded_instance_config: # Recommended for all production VMs
+#     shielded_instance_config:
 #       enable_secure_boot: true
 #       enable_vtpm: true
 #       enable_integrity_monitoring: true

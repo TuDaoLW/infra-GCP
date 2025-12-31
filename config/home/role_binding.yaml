@@ -1,100 +1,100 @@
 ---
 iam_role_bindings:
   management-vm-operator-binding: # Unique identifier
-    role: "projects/stone-booking-482114-v1/roles/managementVmOperator"
+    role: "projects/test-482612/roles/managementVmOperator"
     members:
-      - "serviceAccount:management-vm-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
-    resource_id: "stone-booking-482114-v1" # The specific resource this binding applies to
+      - "serviceAccount:management-vm-sa@test-482612.iam.gserviceaccount.com"
+    resource_id: "test-482612" # The specific resource this binding applies to
     resource_type: "project" # The type of resource (e.g., "project", "bucket")
     description: "Binds the custom Management VM Operator role to the management service account at the project level."
     condition: # Optional: Example (e.g., time-based access), Conditions can't be set on primitive roles.
       title: "temporary-access"
-      expression: 'request.time < timestamp("2025-12-31T23:59:59Z")'
+      expression: 'request.time < timestamp("2026-12-31T23:59:59Z")'
       description: "Temporary access for management VM during migration phase."
 
   management-vm-gke-developer-binding:
       role: "roles/container.developer"
       members:
-        - "serviceAccount:management-vm-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
-      resource_id: "stone-booking-482114-v1"
+        - "serviceAccount:management-vm-sa@test-482612.iam.gserviceaccount.com"
+      resource_id: "test-482612"
       resource_type: "project"
       description: "Grants full control over Kubernetes workloads (Pods, Services, Deployments) but not cluster administration."
       condition:
         title: "temporary-access"
-        expression: 'request.time < timestamp("2025-12-31T23:59:59Z")'
+        expression: 'request.time < timestamp("2026-12-31T23:59:59Z")'
         description: "Temporary access matching the custom role."
 
   workload-identity-my-app-binding:
     role: "roles/iam.workloadIdentityUser" # Special IAM role for Workload Identity
     members:
-      - "serviceAccount:stone-booking-482114-v1.svc.id.goog[default/my-app-ksa]"
-    resource_id: "my-app-gsa@stone-booking-482114-v1.iam.gserviceaccount.com" 
+      - "serviceAccount:test-482612.svc.id.goog[default/my-app-ksa]"
+    resource_id: "my-app-gsa@test-482612.iam.gserviceaccount.com" 
     resource_type: "serviceAccount"
     description: "Enables Kubernetes Service Account 'default/my-app-ksa' to impersonate 'my-app-gsa' via Workload Identity."
 
-  # GKE Node Pool Access (if not using Autopilot)
-  gke-node-pool-access-binding:
-    role: "roles/container.nodeServiceAccount"
-    members:
-      - "serviceAccount:gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
-    resource_id: "stone-booking-482114-v1"
-    resource_type: "project"
-    description: "Grants essential permissions for GKE worker nodes (e.g., to register with the control plane, pull images)."
+  # # GKE Node Pool Access (if not using Autopilot)
+  # gke-node-pool-access-binding:
+  #   role: "roles/container.nodeServiceAccount"
+  #   members:
+  #     - "serviceAccount:gke-node-sa@test-482612.iam.gserviceaccount.com"
+  #   resource_id: "test-482612"
+  #   resource_type: "project"
+  #   description: "Grants essential permissions for GKE worker nodes (e.g., to register with the control plane, pull images)."
 
   gke-node-logging-binding:
     role: "roles/logging.logWriter"
     members:
-      - "serviceAccount:cloudrun-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
-      - "serviceAccount:gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
-    resource_id: "stone-booking-482114-v1"
+      - "serviceAccount:cloudrun-sa@test-482612.iam.gserviceaccount.com"
+      - "serviceAccount:gke-node-sa@test-482612.iam.gserviceaccount.com"
+    resource_id: "test-482612"
     resource_type: "project"
     description: "Allows GKE worker nodes to write logs to Cloud Logging."
 
   gke-node-monitoring-binding:
     role: "roles/monitoring.metricWriter"
     members:
-      - "serviceAccount:cloudrun-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
-      - "serviceAccount:gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
-    resource_id: "stone-booking-482114-v1"
+      - "serviceAccount:cloudrun-sa@test-482612.iam.gserviceaccount.com"
+      - "serviceAccount:gke-node-sa@test-482612.iam.gserviceaccount.com"
+    resource_id: "test-482612"
     resource_type: "project"
     description: "Allows GKE worker nodes to write metrics to Cloud Monitoring."
 
   gke-node-default-role-binding:
     role: "roles/container.defaultNodeServiceAccount"
     members:
-      - "serviceAccount:gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
-    resource_id: "stone-booking-482114-v1"
+      - "serviceAccount:gke-node-sa@test-482612.iam.gserviceaccount.com"
+    resource_id: "test-482612"
     resource_type: "project"
     description: "Required minimum role for GKE node service account."
 
 # --------------- CR
-  cloudrun-service-agent:
-    role: "roles/run.serviceAgent"
-    members:
-      - "serviceAccount:cloudrun-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
-    resource_id: "stone-booking-482114-v1"
-    resource_type: "project"
+  # cloudrun-service-agent:
+  #   role: "roles/run.serviceAgent"
+  #   members:
+  #     - "serviceAccount:cloudrun-sa@test-482612.iam.gserviceaccount.com"
+  #   resource_id: "test-482612"
+  #   resource_type: "project"
 
   # Pull images from Artifact Registry (recommended over GCR)
   cloudrun-artifact-registry:
     role: "roles/artifactregistry.reader"
     members:
-      - "serviceAccount:cloudrun-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
-    resource_id: "stone-booking-482114-v1"
+      - "serviceAccount:cloudrun-sa@test-482612.iam.gserviceaccount.com"
+    resource_id: "test-482612"
     resource_type: "project"
 
   # Access to private Cloud SQL (via Direct VPC egress)
   cloudrun-cloudsql-client:
     role: "roles/cloudsql.client"
     members:
-      - "serviceAccount:cloudrun-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
-    resource_id: "stone-booking-482114-v1"
+      - "serviceAccount:cloudrun-sa@test-482612.iam.gserviceaccount.com"
+    resource_id: "test-482612"
     resource_type: "project"
 
-  cloudrun-agent-token-creator:
+  cloudrun-runtime-impersonate:
     role: "roles/iam.serviceAccountTokenCreator"
     members:
-      - "serviceAccount:service-164834404784@serverless-robot-prod.iam.gserviceaccount.com"  # Cloud Run runtime agent
-    resource_id: "cloudrun-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
-    resource_type: "serviceAccount"  # Important: bind on the target SA
-    description: "Allows Cloud Run agent to impersonate cloudrun-sa"
+      - "serviceAccount:service-164834404784@serverless-robot-prod.iam.gserviceaccount.com"
+    resource_id: "cloudrun-sa@test-482612.iam.gserviceaccount.com"
+    resource_type: "serviceAccount"
+    description: "Allows Cloud Run runtime to impersonate cloudrun-sa"

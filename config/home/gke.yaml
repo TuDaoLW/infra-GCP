@@ -1,12 +1,12 @@
 ---
 # gke_clusters:
 #   cluster-sea1:
-#     project_id: stone-booking-482114-v1
+#     project_id: test-482612
 #     location: asia-southeast1-a
 #     description: "Primary GKE cluster"
 
-#     network: "projects/stone-booking-482114-v1/global/networks/sample-vpc"
-#     subnetwork: "projects/stone-booking-482114-v1/regions/asia-southeast1/subnetworks/gke-primary"
+#     network: "projects/test-482612/global/networks/sample-vpc"
+#     subnetwork: "projects/test-482612/regions/asia-southeast1/subnetworks/gke-primary"
 
 #     master_authorized_networks_config:
 #       cidr_blocks:
@@ -36,7 +36,7 @@
 #     machine_type: e2-medium
 #     disk_size_gb: 36
 #     spot: true
-#     service_account: "gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
+#     service_account: "gke-node-sa@test-482612.iam.gserviceaccount.com"
 
 #     # default scale, nap, should not use, cant control node size
 #     default_autoscaling_enabled: false
@@ -60,7 +60,7 @@
 #         machine_type: e2-medium
 #         disk_size_gb: 48
 #         spot: true
-#         service_account: "gke-node-sa@stone-booking-482114-v1.iam.gserviceaccount.com"
+#         service_account: "gke-node-sa@test-482612.iam.gserviceaccount.com"
 #         labels:
 #           workload-type: "general"
 #         # taints:

@@ -1,0 +1,12 @@
+---
+cloud_dns_zones:
+  tudao:
+    dns_name: "tudaolw.io.vn."
+    visibility: public
+    dnssec_enabled: true
+    recordsets:
+      nginx:  
+        name: "nginx" 
+        type: "CNAME"
+        ttl: 300
+        rrdatas: ["ghs.googlehosted.com."]
