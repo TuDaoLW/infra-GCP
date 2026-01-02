@@ -1,0 +1,16 @@
+---
+artifact_registries:
+  app-images:
+    location: "asia-southeast1" 
+    repository_id: "app-images"
+    immutable_tags: true
+    cleanup_policies:
+      delete-untagged-old:
+        action: "DELETE"
+        condition:
+          tag_state: "UNTAGGED"
+          older_than: "7d"  # Delete untagged after 30 days
+      keep-latest-10-tagged:
+        action: "KEEP"
+        most_recent_versions:
+          keep_count: 3  # Keep latest 10 tagged versions

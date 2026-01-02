@@ -1,5 +1,18 @@
 ---
 firewall_rules: #{} #none
+  allow-my-ip-all-subnets:
+    network: "projects/test-482612/global/networks/sample-vpc"
+    direction: INGRESS
+    priority: 300
+    action: ALLOW
+    source_ranges:
+      - "14.238.24.130/32"         
+    target_ranges:
+      - "10.0.0.0/24"
+    protocols:
+      - protocol: all       
+    description: "Allows my conn to infra."
+
   allow-master-to-nodes:
     network: "projects/test-482612/global/networks/sample-vpc"
     direction: INGRESS

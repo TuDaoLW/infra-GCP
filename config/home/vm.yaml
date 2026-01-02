@@ -1,5 +1,181 @@
 ---
 # compute_instances:
+#   k3s:
+#     project_id: test-482612
+#     zone: asia-southeast1-b
+#     machine_type: e2-standard-4
+#     description: "Primary PostgreSQL HA node"
+#     service_account: management-vm-sa
+#     disks:
+#       - device_name: boot-disk
+#         boot: true
+#         auto_delete: true
+#         initialize_params:
+#           image: "projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts"
+#           size_gb: 64
+#           type: pd-ssd
+#     network_interfaces:
+#       - subnetwork: "projects/test-482612/regions/asia-southeast1/subnetworks/management"
+#         network_ip: "10.0.0.30"
+#         access_configs:
+#         - {}
+#     metadata:
+#       enable-oslogin: "TRUE"
+#       startup-script: |
+#         #!/bin/bash
+#         sudo apt-get update
+        
+#     tags:
+#       - "ssh-allowed"
+#     shielded_instance_config:
+#       enable_secure_boot: true
+#       enable_vtpm: true
+#       enable_integrity_monitoring: true
+
+#   postgres-ha-vm-01:
+#     project_id: test-482612
+#     zone: asia-southeast1-b
+#     machine_type: e2-medium
+#     description: "Primary PostgreSQL HA node"
+#     service_account: management-vm-sa
+#     disks:
+#       - device_name: boot-disk
+#         boot: true
+#         auto_delete: true
+#         initialize_params:
+#           image: "projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts"
+#           size_gb: 50
+#           type: pd-ssd
+#     network_interfaces:
+#       - subnetwork: "projects/test-482612/regions/asia-southeast1/subnetworks/management"
+#         network_ip: "10.0.0.11"
+#     metadata:
+#       enable-oslogin: "TRUE"
+#       startup-script: |
+#         #!/bin/bash
+#         sudo apt-get update
+#         # sudo apt-get install -y postgresql postgresql-contrib
+#         # # Configure replication settings
+#         # echo "host replication all 10.0.1.12/32 md5" | sudo tee -a /etc/postgresql/14/main/pg_hba.conf
+#         # sudo systemctl restart postgresql
+#     tags:
+#       - "postgres-server"
+#       - "ssh-allowed"
+#     extra_labels:
+#       application: "postgres-ha"
+#       role: "primary"
+#     shielded_instance_config:
+#       enable_secure_boot: true
+#       enable_vtpm: true
+#       enable_integrity_monitoring: true
+
+#   postgres-ha-vm-02:
+#     project_id: test-482612
+#     zone: asia-southeast1-b
+#     machine_type: e2-medium
+#     description: "Replica PostgreSQL HA node"
+#     service_account: management-vm-sa
+#     disks:
+#       - device_name: boot-disk
+#         boot: true
+#         auto_delete: true
+#         initialize_params:
+#           image: "projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts"
+#           size_gb: 50
+#           type: pd-ssd
+#     network_interfaces:
+#       - subnetwork: "projects/test-482612/regions/asia-southeast1/subnetworks/management"
+#         network_ip: "10.0.0.12"
+#     metadata:
+#       enable-oslogin: "TRUE"
+#       startup-script: |
+#         #!/bin/bash
+#         sudo apt-get update
+#         # sudo apt-get install -y postgresql postgresql-contrib
+#         # # Configure as standby replica
+#         # sudo -u postgres pg_basebackup -h 10.0.1.11 -D /var/lib/postgresql/14/main -U replication -P -R
+#         # sudo systemctl restart postgresql
+#     tags:
+#       - "postgres-server"
+#       - "ssh-allowed"
+#     extra_labels:
+#       application: "postgres-ha"
+#       role: "replica"
+#     shielded_instance_config:
+#       enable_secure_boot: true
+#       enable_vtpm: true
+#       enable_integrity_monitoring: true
+
+#   postgres-ha-vm-03:
+#     project_id: test-482612
+#     zone: asia-southeast1-b
+#     machine_type: e2-medium
+#     description: "Primary PostgreSQL HA node"
+#     service_account: management-vm-sa
+#     disks:
+#       - device_name: boot-disk
+#         boot: true
+#         auto_delete: true
+#         initialize_params:
+#           image: "projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts"
+#           size_gb: 50
+#           type: pd-ssd
+#     network_interfaces:
+#       - subnetwork: "projects/test-482612/regions/asia-southeast1/subnetworks/management"
+#         network_ip: "10.0.0.13"
+#     metadata:
+#       enable-oslogin: "TRUE"
+#       startup-script: |
+#         #!/bin/bash
+#         sudo apt-get update
+#         # sudo apt-get install -y postgresql postgresql-contrib
+#         # # Configure replication settings
+#         # echo "host replication all 10.0.1.12/32 md5" | sudo tee -a /etc/postgresql/14/main/pg_hba.conf
+#         # sudo systemctl restart postgresql
+#     tags:
+#       - "postgres-server"
+#       - "ssh-allowed"
+#     extra_labels:
+#       application: "postgres-ha"
+#       role: "primary"
+#     shielded_instance_config:
+#       enable_secure_boot: true
+#       enable_vtpm: true
+#       enable_integrity_monitoring: true
+
+#   ha-proxy-vm:
+#     project_id: test-482612
+#     zone: asia-southeast1-b
+#     machine_type: e2-medium
+#     description: "Primary PostgreSQL HA node"
+#     service_account: management-vm-sa
+#     disks:
+#       - device_name: boot-disk
+#         boot: true
+#         auto_delete: true
+#         initialize_params:
+#           image: "projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts"
+#           size_gb: 10
+#           type: pd-ssd
+#     network_interfaces:
+#       - subnetwork: "projects/test-482612/regions/asia-southeast1/subnetworks/management"
+#         network_ip: "10.0.0.20"
+#     metadata:
+#       enable-oslogin: "TRUE"
+#       startup-script: |
+#         #!/bin/bash
+#         sudo apt-get update
+#     tags:
+#       - "postgres-lb"
+#       - "ssh-allowed"
+#     extra_labels:
+#       application: "postgres-ha"
+#       role: "primary"
+#     shielded_instance_config:
+#       enable_secure_boot: true
+#       enable_vtpm: true
+#       enable_integrity_monitoring: true
+      
 #   management-vm-01: #new format
 #     project_id: test-482612
 #     zone: asia-southeast1-b
